@@ -10,7 +10,7 @@ import com.ykim.snoozeloo.R
 
 // Set of Material typography styles to start with
 val montserrat = FontFamily(
-    Font(R.font.montserrat_regular, FontWeight.Normal),
+    Font(R.font.montserrat_medium, FontWeight.Normal),
     Font(R.font.montserrat_semi_bold, FontWeight.SemiBold)
 )
 
@@ -19,8 +19,6 @@ val Typography = Typography(
         fontFamily = montserrat,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp,
         color = SnoozelooBlack
     ),
     bodyMedium = TextStyle(

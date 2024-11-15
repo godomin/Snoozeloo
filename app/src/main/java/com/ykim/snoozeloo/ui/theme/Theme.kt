@@ -10,6 +10,7 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = SnoozelooWhite,
     surface = SnoozelooBackground,
     onSurface = SnoozelooBlack,
+    primaryContainer = SnoozelooPrimaryContainer,
 )
 
 @Composable
