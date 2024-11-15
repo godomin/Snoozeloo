@@ -1,4 +1,4 @@
-package com.ykim.snoozeloo
+package com.ykim.snoozeloo.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
