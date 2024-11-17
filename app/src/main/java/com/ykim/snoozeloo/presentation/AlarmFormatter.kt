@@ -49,6 +49,18 @@ fun Int.to12HourFormat(): Pair<String, String> {
     return time to period
 }
 
+fun String.to24HourMinute(period: String): Pair<String, String> {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val time = LocalTime.parse("$this $period", DateTimeFormatter.ofPattern(FORMAT_12_HOUR, Locale.ENGLISH))
+        val (hour, minute) = time.format(DateTimeFormatter.ofPattern(FORMAT_24_HOUR, Locale.ENGLISH)).split(":")
+        hour to minute
+    } else {
+        val date = SimpleDateFormat(FORMAT_12_HOUR, Locale.ENGLISH).parse("$this $period")
+        val (hour, minute) = SimpleDateFormat(FORMAT_24_HOUR, Locale.ENGLISH).format(date).split(":")
+        hour to minute
+    }
+}
+
 fun String.toMinutes(period: String): Int {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val time = LocalTime.parse("$this $period", DateTimeFormatter.ofPattern(FORMAT_12_HOUR, Locale.ENGLISH))

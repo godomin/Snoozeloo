@@ -1,6 +1,7 @@
 package com.ykim.snoozeloo.data
 
 import com.ykim.snoozeloo.data.database.AlarmDao
+import com.ykim.snoozeloo.data.database.AlarmEntity
 import com.ykim.snoozeloo.domain.AlarmRepository
 import com.ykim.snoozeloo.domain.model.AlarmData
 import kotlinx.coroutines.flow.Flow
@@ -16,6 +17,10 @@ class AlarmRepositoryImpl @Inject constructor(
 
     override suspend fun deleteAlarm(alarmData: AlarmData) {
         alarmDao.deleteAlarm(alarmData.toAlarmEntity())
+    }
+
+    override suspend fun getAlarm(id: Int): AlarmEntity? {
+        return alarmDao.getAlarmById(id)
     }
 
     override fun getAlarms(): Flow<List<AlarmData>> {

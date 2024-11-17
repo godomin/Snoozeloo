@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.ykim.snoozeloo.presentation.detail.DetailScreenRoot
 import com.ykim.snoozeloo.presentation.list.ListScreenRoot
 import com.ykim.snoozeloo.presentation.model.Alarm
@@ -25,7 +26,7 @@ fun NavigationRoot(
             )
         }
         composable<Detail> {
-            DetailScreenRoot()
+            DetailScreenRoot(navController)
         }
         // TODO:
     }
