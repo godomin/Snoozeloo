@@ -1,6 +1,7 @@
 package com.ykim.snoozeloo.presentation.list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +26,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.ykim.snoozeloo.R
 import com.ykim.snoozeloo.presentation.components.ListCard
 import com.ykim.snoozeloo.presentation.components.SnoozelooFloatingActionButton
@@ -34,12 +34,20 @@ import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
 @Composable
 fun ListScreenRoot(
-    navController: NavController,
+    onItemClick: (Alarm) -> Unit,
+    onAddClick: () -> Unit,
     viewModel: ListViewModel = hiltViewModel(),
 ) {
     ListScreen(
         state = viewModel.state,
-        onAction = viewModel::onAction
+        onAction = { action ->
+            when (action) {
+                is ListAction.OnAddAlarmClick -> onAddClick()
+                is ListAction.OnEditAlarmClick -> onItemClick(action.alarm)
+                else -> Unit
+            }
+            viewModel.onAction(action)
+        }
     )
 }
 
@@ -52,7 +60,7 @@ private fun ListScreen(
         floatingActionButton = {
             SnoozelooFloatingActionButton(
                 icon = ImageVector.vectorResource(id = R.drawable.plus),
-                onClick = { /*TODO*/ },
+                onClick = { onAction(ListAction.OnAddAlarmClick) },
                 modifier = Modifier.padding(bottom = 12.dp)
             )
         },
@@ -92,13 +100,18 @@ private fun ListScreen(
                 }
             } else {
                 Spacer(modifier = Modifier.height(24.dp))
-                LazyColumn(
-                    modifier = Modifier,
+                LazyColumn(                    modifier = Modifier,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    itemsIndexed(state.alarmList) { index, alarm ->
+                    items(state.alarmList) { alarm ->
                         ListCard(
-                            data = alarm
+                            modifier = Modifier.clickable {
+                                onAction(ListAction.OnEditAlarmClick(alarm))
+                            },
+                            data = alarm,
+                            onToggle = {
+                                onAction(ListAction.OnAlarmToggleClick(alarm))
+                            }
                         )
                     }
                 }

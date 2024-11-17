@@ -17,7 +17,8 @@ class ListViewModel @Inject constructor(
 
     fun onAction(action: ListAction) {
         when (action) {
-            ListAction.OnAddAlarmClick -> TODO()
+            is ListAction.OnAlarmToggleClick -> TODO()
+            else -> Unit
         }
     }
 }
