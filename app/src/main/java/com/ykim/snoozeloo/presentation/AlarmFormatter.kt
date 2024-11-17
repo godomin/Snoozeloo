@@ -3,7 +3,7 @@ package com.ykim.snoozeloo.presentation
 import android.content.Context
 import android.os.Build
 import com.ykim.snoozeloo.R
-import com.ykim.snoozeloo.data.database.AlarmEntity
+import com.ykim.snoozeloo.domain.model.AlarmData
 import com.ykim.snoozeloo.presentation.model.Alarm
 import java.text.SimpleDateFormat
 import java.time.LocalTime
@@ -15,9 +15,10 @@ private const val FORMAT_12_HOUR = "hh:mm a"
 private const val FORMAT_24_HOUR = "HH:mm"
 private const val DAY_IN_MINUTES = 1440
 
-fun AlarmEntity.toAlarm(context: Context): Alarm {
+fun AlarmData.toAlarm(context: Context): Alarm {
     val (time, period) = time.to12HourFormat()
     return Alarm(
+        id = id,
         name = name,
         time = time,
         period = period,

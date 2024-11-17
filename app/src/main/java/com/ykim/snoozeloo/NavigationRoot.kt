@@ -16,8 +16,8 @@ fun NavigationRoot(
     NavHost(navController = navController, startDestination = List) {
         composable<List> {
             ListScreenRoot(
-                onItemClick = { alarm ->
-                    navController.navigate(Detail(alarm))
+                onItemClick = { id ->
+                    navController.navigate(Detail(id))
                 },
                 onAddClick = {
                     navController.navigate(Detail(null))
@@ -35,7 +35,7 @@ fun NavigationRoot(
 object List
 @Serializable
 data class Detail(
-    val alarm: Alarm?
+    val id: Int?
 )
 @Serializable
 object Trigger

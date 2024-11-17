@@ -1,9 +1,7 @@
 package com.ykim.snoozeloo.presentation.model
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class Alarm(
+    val id: Int,
     val name: String? = null,
     val time: String,
     val period: String,

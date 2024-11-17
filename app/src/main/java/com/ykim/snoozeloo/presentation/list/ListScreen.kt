@@ -34,7 +34,7 @@ import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
 @Composable
 fun ListScreenRoot(
-    onItemClick: (Alarm) -> Unit,
+    onItemClick: (Int) -> Unit,
     onAddClick: () -> Unit,
     viewModel: ListViewModel = hiltViewModel(),
 ) {
@@ -43,7 +43,7 @@ fun ListScreenRoot(
         onAction = { action ->
             when (action) {
                 is ListAction.OnAddAlarmClick -> onAddClick()
-                is ListAction.OnEditAlarmClick -> onItemClick(action.alarm)
+                is ListAction.OnEditAlarmClick -> onItemClick(action.id)
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -106,7 +106,7 @@ private fun ListScreen(
                     items(state.alarmList) { alarm ->
                         ListCard(
                             modifier = Modifier.clickable {
-                                onAction(ListAction.OnEditAlarmClick(alarm))
+                                onAction(ListAction.OnEditAlarmClick(alarm.id))
                             },
                             data = alarm,
                             onToggle = {
@@ -128,6 +128,7 @@ private fun ListScreenPreview() {
             state = ListState(
                 alarmList = listOf(
                     Alarm(
+                        0,
                         "Wake Up",
                         "10:00",
                         "AM",
@@ -135,6 +136,7 @@ private fun ListScreenPreview() {
                         true
                     ),
                     Alarm(
+                        1,
                         "Education",
                         "04:00",
                         "PM",

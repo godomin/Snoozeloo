@@ -15,7 +15,7 @@ hiltCompilerVersion = "1.2.0"
 roomCommon = "2.6.1"
 roomCompiler = "2.6.1"
 roomKtx = "2.6.1"
-ksp = "1.9.22-1.0.17"
+ksp = "1.9.20-1.0.14"
 serialization = "1.6.3"
 
 [libraries]

@@ -5,6 +5,7 @@ import com.ykim.snoozeloo.domain.model.AlarmData
 
 fun AlarmEntity.toAlarmData(): AlarmData {
     return AlarmData(
+        id = id,
         name = name,
         time = time,
         enabled = enabled,
@@ -13,6 +14,7 @@ fun AlarmEntity.toAlarmData(): AlarmData {
 
 fun AlarmData.toAlarmEntity(): AlarmEntity {
     return AlarmEntity(
+        id = id,
         name = name,
         time = time,
         enabled = enabled,
