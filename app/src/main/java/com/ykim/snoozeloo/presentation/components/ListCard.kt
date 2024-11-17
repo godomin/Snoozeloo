@@ -83,7 +83,6 @@ private fun ListCardPreview() {
     SnoozelooTheme {
         ListCard(
             data = Alarm(
-                0,
                 "Wake Up",
                 "10:00",
                 "AM",

@@ -9,10 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.ykim.snoozeloo.domain.AlarmRepository
 import com.ykim.snoozeloo.presentation.model.Alarm
 import com.ykim.snoozeloo.presentation.toAlarm
+import com.ykim.snoozeloo.presentation.toAlarmData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,14 +43,18 @@ class ListViewModel @Inject constructor(
     }
 
     private fun onAlarmToggle(alarm: Alarm) {
+        val toggledAlarm = alarm.copy(enabled = !alarm.enabled)
         state = state.copy(
             alarmList = state.alarmList.map {
-                if (it.time == alarm.time) {
-                    it.copy(enabled = !it.enabled)
+                if (it.id == alarm.id) {
+                    toggledAlarm
                 } else {
                     it
                 }
             }
         )
+        viewModelScope.launch {
+            alarmRepository.updateAlarm(toggledAlarm.toAlarmData())
+        }
     }
 }

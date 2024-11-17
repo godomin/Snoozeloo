@@ -10,7 +10,7 @@ import javax.inject.Inject
 class AlarmRepositoryImpl @Inject constructor(
     private val alarmDao: AlarmDao
 ) : AlarmRepository {
-    override suspend fun upsertAlarm(alarmData: AlarmData) {
+    override suspend fun updateAlarm(alarmData: AlarmData) {
         alarmDao.upsertAlarm(alarmData.toAlarmEntity())
     }
 

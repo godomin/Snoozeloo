@@ -27,25 +27,34 @@ fun AlarmData.toAlarm(context: Context): Alarm {
     )
 }
 
+fun Alarm.toAlarmData(): AlarmData {
+    return AlarmData(
+        id = id,
+        name = name,
+        time = time.toMinutes(period),
+        enabled = enabled,
+    )
+}
+
 fun Int.to12HourFormat(): Pair<String, String> {
     val (time, period) = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val time = LocalTime.of(this / 60, this % 60)
-        time.format(DateTimeFormatter.ofPattern(FORMAT_12_HOUR)).split(" ")
+        time.format(DateTimeFormatter.ofPattern(FORMAT_12_HOUR, Locale.ENGLISH)).split(" ")
     } else {
         val hour = this / 60
         val minute = this % 60
         val date = SimpleDateFormat(FORMAT_24_HOUR, Locale.getDefault()).parse("$hour:$minute")
-        SimpleDateFormat(FORMAT_12_HOUR, Locale.getDefault()).format(date).split(" ")
+        SimpleDateFormat(FORMAT_12_HOUR, Locale.ENGLISH).format(date).split(" ")
     }
     return time to period
 }
 
 fun String.toMinutes(period: String): Int {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val time = LocalTime.parse("$this $period", DateTimeFormatter.ofPattern(FORMAT_12_HOUR))
+        val time = LocalTime.parse("$this $period", DateTimeFormatter.ofPattern(FORMAT_12_HOUR, Locale.ENGLISH))
         time.hour * 60 + time.minute
     } else {
-        val date = SimpleDateFormat(FORMAT_12_HOUR, Locale.getDefault()).parse("$this $period")
+        val date = SimpleDateFormat(FORMAT_12_HOUR, Locale.ENGLISH).parse("$this $period")
         val calendar = Calendar.getInstance().apply { time = date }
         calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
     }
@@ -53,10 +62,10 @@ fun String.toMinutes(period: String): Int {
 
 fun Int.timeLeft(context: Context): String {
     val now = getCurrentTimeInMinutes()
-    val timeLeft = if (this < now) {
-        now - this
+    val timeLeft = if (this > now) {
+        this - now
     } else {
-        now - this + DAY_IN_MINUTES
+        this - now + DAY_IN_MINUTES
     }
     val hour = timeLeft / 60
     val minute = timeLeft % 60

@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface AlarmRepository {
 
-    suspend fun upsertAlarm(alarmData: AlarmData)
+    suspend fun updateAlarm(alarmData: AlarmData)
 
     suspend fun deleteAlarm(alarmData: AlarmData)
 

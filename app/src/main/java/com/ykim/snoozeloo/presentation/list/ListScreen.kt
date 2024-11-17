@@ -106,7 +106,9 @@ private fun ListScreen(
                     items(state.alarmList) { alarm ->
                         ListCard(
                             modifier = Modifier.clickable {
-                                onAction(ListAction.OnEditAlarmClick(alarm.id))
+                                alarm.id?.let { id ->
+                                    onAction(ListAction.OnEditAlarmClick(id))
+                                }
                             },
                             data = alarm,
                             onToggle = {
@@ -128,7 +130,6 @@ private fun ListScreenPreview() {
             state = ListState(
                 alarmList = listOf(
                     Alarm(
-                        0,
                         "Wake Up",
                         "10:00",
                         "AM",
@@ -136,7 +137,6 @@ private fun ListScreenPreview() {
                         true
                     ),
                     Alarm(
-                        1,
                         "Education",
                         "04:00",
                         "PM",
