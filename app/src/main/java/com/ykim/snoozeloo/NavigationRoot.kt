@@ -26,7 +26,11 @@ fun NavigationRoot(
             )
         }
         composable<Detail> {
-            DetailScreenRoot(navController)
+            DetailScreenRoot(
+                onCloseScreen = {
+                    navController.popBackStack()
+                }
+            )
         }
         // TODO:
     }

@@ -11,6 +11,8 @@ private val LightColorScheme = lightColorScheme(
     surface = SnoozelooBackground,
     onSurface = SnoozelooBlack,
     primaryContainer = SnoozelooPrimaryContainer,
+    surfaceDim = SnoozelooGray,
+    inverseSurface = SnoozelooDarkGray
 )
 
 @Composable

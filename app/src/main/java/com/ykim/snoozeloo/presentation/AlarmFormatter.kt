@@ -36,6 +36,7 @@ fun Alarm.toAlarmData(): AlarmData {
     )
 }
 
+// 870 -> "02:30 PM"
 fun Int.to12HourFormat(): Pair<String, String> {
     val (time, period) = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val time = LocalTime.of(this / 60, this % 60)
@@ -49,7 +50,15 @@ fun Int.to12HourFormat(): Pair<String, String> {
     return time to period
 }
 
-fun String.to24HourMinute(period: String): Pair<String, String> {
+// 870 -> "14", "30"
+fun Int.to24HourFormat(): Pair<String, String> {
+    val hour = this / 60
+    val minute = this % 60
+    return hour.toString() to minute.toString()
+}
+
+// "02:30 PM" -> "14", "30"
+fun String.to24HourFormat(period: String): Pair<String, String> {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val time = LocalTime.parse("$this $period", DateTimeFormatter.ofPattern(FORMAT_12_HOUR, Locale.ENGLISH))
         val (hour, minute) = time.format(DateTimeFormatter.ofPattern(FORMAT_24_HOUR, Locale.ENGLISH)).split(":")
@@ -61,12 +70,25 @@ fun String.to24HourMinute(period: String): Pair<String, String> {
     }
 }
 
+// "02:30 PM" -> 870
 fun String.toMinutes(period: String): Int {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val time = LocalTime.parse("$this $period", DateTimeFormatter.ofPattern(FORMAT_12_HOUR, Locale.ENGLISH))
         time.hour * 60 + time.minute
     } else {
         val date = SimpleDateFormat(FORMAT_12_HOUR, Locale.ENGLISH).parse("$this $period")
+        val calendar = Calendar.getInstance().apply { time = date }
+        calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
+    }
+}
+
+// "14:30" -> 870
+fun String.toMinutes(): Int {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val time = LocalTime.parse(this, DateTimeFormatter.ofPattern(FORMAT_24_HOUR, Locale.ENGLISH))
+        time.hour * 60 + time.minute
+    } else {
+        val date = SimpleDateFormat(FORMAT_12_HOUR, Locale.ENGLISH).parse(this)
         val calendar = Calendar.getInstance().apply { time = date }
         calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
     }

@@ -39,11 +39,17 @@ val Typography = Typography(
         fontSize = 16.sp,
         color = SnoozelooBlack
     ),
+    titleLarge = TextStyle(
+        fontFamily = montserrat,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 20.sp,
+        color = SnoozelooBlack
+    ),
     displayLarge = TextStyle(
         fontFamily = montserrat,
         fontWeight = FontWeight.Normal,
         fontSize = 52.sp,
-        color = SnoozelooBlack
+        color = SnoozelooDarkGray
     ),
     displayMedium = TextStyle(
         fontFamily = montserrat,
