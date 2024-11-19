@@ -26,9 +26,10 @@ class TriggerViewModel @Inject constructor(
     private val eventChannel = Channel<TriggerEvent>()
     val events = eventChannel.receiveAsFlow()
 
+    private val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+    private val ringtone = RingtoneManager.getRingtone(context, alarmUri)
+
     init {
-        val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-        val ringtone = RingtoneManager.getRingtone(context, alarmUri)
         ringtone.play()
     }
 
@@ -46,6 +47,7 @@ class TriggerViewModel @Inject constructor(
                 is TriggerAction.OnTurnOff -> {
                     eventChannel.send(TriggerEvent.TurnOffAlarm)
                     context.cancelAlarm(state.id ?: 0)
+                    ringtone.stop()
                 }
             }
         }

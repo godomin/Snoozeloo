@@ -37,8 +37,8 @@ import java.util.Locale
 @Composable
 fun TriggerScreenRoot(
     alarmId: Int,
-    alarmName: String,
     alarmTime: String,
+    alarmName: String,
     viewModel: TriggerViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -49,8 +49,8 @@ fun TriggerScreenRoot(
             }
         }
     }
-    LaunchedEffect(alarmId, alarmName, alarmTime) {
-        viewModel.setInitialData(alarmId, alarmName, alarmTime)
+    LaunchedEffect(alarmId, alarmTime, alarmName) {
+        viewModel.setInitialData(alarmId, alarmTime, alarmName)
     }
     TriggerScreen(
         state = viewModel.state,
@@ -85,12 +85,14 @@ private fun TriggerScreen(
                     fontSize = 82.sp
                 )
         )
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(
-            text = state.name.uppercase(Locale.ENGLISH),
-            style = MaterialTheme.typography.headlineMedium
-                .copy(fontWeight = FontWeight.SemiBold)
-        )
+        if (state.name.isNotBlank()) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = state.name.uppercase(Locale.ENGLISH),
+                style = MaterialTheme.typography.headlineMedium
+                    .copy(fontWeight = FontWeight.SemiBold)
+            )
+        }
         Spacer(modifier = Modifier.height(24.dp))
         SnoozelooButton(
             text = stringResource(id = R.string.turn_off),

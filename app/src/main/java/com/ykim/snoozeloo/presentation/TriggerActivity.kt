@@ -19,14 +19,14 @@ class TriggerActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val alarmId = intent.getIntExtra(ALARM_ID, 0)
-        val alarmName = intent.getStringExtra(ALARM_NAME) ?: ""
         val alarmTime = intent.getStringExtra(ALARM_TIME) ?: ""
+        val alarmName = intent.getStringExtra(ALARM_NAME) ?: ""
         setContent {
             SnoozelooTheme {
                 TriggerScreenRoot(
                     alarmId = alarmId,
-                    alarmName = alarmName,
-                    alarmTime = alarmTime
+                    alarmTime = alarmTime,
+                    alarmName = alarmName
                 )
             }
         }

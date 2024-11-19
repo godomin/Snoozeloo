@@ -116,12 +116,9 @@ private fun ListScreen(
         )
     }
 
-    var showOverlayPermissionDialog by remember {
-        mutableStateOf(!state.isOverlayPermissionGranted)
-    }
-    if (showOverlayPermissionDialog) {
+    if (!state.isOverlayPermissionGranted) {
         OverlayPermissionDialog(
-            onDismiss = { showOverlayPermissionDialog = false }
+            onDismiss = {}
         )
     }
     Scaffold(

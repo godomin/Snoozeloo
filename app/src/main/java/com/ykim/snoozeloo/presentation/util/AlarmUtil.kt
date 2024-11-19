@@ -1,6 +1,7 @@
 package com.ykim.snoozeloo.presentation.util
 
 import android.app.AlarmManager
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -52,15 +53,8 @@ fun Context.registerAlarm(alarm: Alarm) {
 }
 
 fun Context.cancelAlarm(alarmId: Int) {
-    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    val intent = Intent(this, AlarmReceiver::class.java)
-    val pendingIntent = PendingIntent.getBroadcast(
-        this,
-        alarmId,
-        intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
-    alarmManager.cancel(pendingIntent)
+    val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.cancel(alarmId)
 }
 
 fun Context.showNotificationWithFullScreenIntent(receivedIntent: Intent?) {
@@ -79,6 +73,8 @@ fun Context.showNotificationWithFullScreenIntent(receivedIntent: Intent?) {
         .setContentText("content text")
         .setSmallIcon(R.drawable.alarm)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setAutoCancel(true)
+        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         .setFullScreenIntent(fullScreenIntent, true)
 
     val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -92,6 +88,7 @@ private fun NotificationManager.buildChannel(context: Context) {
         val importance = NotificationManager.IMPORTANCE_HIGH
         val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
             description = "description"
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         }
         createNotificationChannel(channel)
     }
