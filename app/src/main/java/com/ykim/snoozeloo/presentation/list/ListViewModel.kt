@@ -10,6 +10,8 @@ import com.ykim.snoozeloo.domain.AlarmRepository
 import com.ykim.snoozeloo.presentation.model.Alarm
 import com.ykim.snoozeloo.presentation.toAlarm
 import com.ykim.snoozeloo.presentation.toAlarmData
+import com.ykim.snoozeloo.presentation.util.cancelAlarm
+import com.ykim.snoozeloo.presentation.util.registerAlarm
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.launchIn
@@ -19,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ListViewModel @Inject constructor(
-    @ApplicationContext context: Context,
+    @ApplicationContext private val context: Context,
     private val alarmRepository: AlarmRepository
 ) : ViewModel() {
 
@@ -55,6 +57,11 @@ class ListViewModel @Inject constructor(
         )
         viewModelScope.launch {
             alarmRepository.updateAlarm(toggledAlarm.toAlarmData())
+        }
+        if (toggledAlarm.enabled) {
+            context.registerAlarm(toggledAlarm)
+        } else {
+            context.cancelAlarm(alarm.id ?: 0)
         }
     }
 }

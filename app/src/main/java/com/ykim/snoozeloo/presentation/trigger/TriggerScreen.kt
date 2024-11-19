@@ -1,5 +1,6 @@
 package com.ykim.snoozeloo.presentation.trigger
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,9 +13,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -27,14 +30,28 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ykim.snoozeloo.R
 import com.ykim.snoozeloo.presentation.components.SnoozelooButton
+import com.ykim.snoozeloo.presentation.util.ObserveAsEvents
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 import java.util.Locale
 
 @Composable
 fun TriggerScreenRoot(
-    navController: NavController,
+    alarmId: Int,
+    alarmName: String,
+    alarmTime: String,
     viewModel: TriggerViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is TriggerEvent.TurnOffAlarm -> {
+                (context as? Activity)?.finish()
+            }
+        }
+    }
+    LaunchedEffect(alarmId, alarmName, alarmTime) {
+        viewModel.setInitialData(alarmId, alarmName, alarmTime)
+    }
     TriggerScreen(
         state = viewModel.state,
         onAction = viewModel::onAction

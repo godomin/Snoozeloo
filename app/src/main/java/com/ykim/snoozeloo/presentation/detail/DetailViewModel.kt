@@ -13,7 +13,9 @@ import com.ykim.snoozeloo.domain.AlarmRepository
 import com.ykim.snoozeloo.domain.model.AlarmData
 import com.ykim.snoozeloo.presentation.timeLeft
 import com.ykim.snoozeloo.presentation.to24HourFormat
+import com.ykim.snoozeloo.presentation.toAlarm
 import com.ykim.snoozeloo.presentation.toMinutes
+import com.ykim.snoozeloo.presentation.util.registerAlarm
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -72,15 +74,15 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun saveAlarm() {
+        val newAlarm = AlarmData(
+            id = state.id,
+            name = state.name,
+            time = "${state.hour}:${state.minute}".toMinutes(),
+            enabled = state.enabled
+        )
         viewModelScope.launch {
-            alarmRepository.updateAlarm(
-                AlarmData(
-                    id = state.id,
-                    name = state.name,
-                    time = "${state.hour}:${state.minute}".toMinutes(),
-                    enabled = state.enabled
-                )
-            )
+            alarmRepository.updateAlarm(newAlarm)
         }
+        context.registerAlarm(newAlarm.toAlarm(context))
     }
 }
