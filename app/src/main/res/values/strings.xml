@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">Snoozeloo</string>
+    <string name="alarm_list_title">Your Alarms</string>
+    <string name="alarm_list_empty">It\'s empty! Add the first alarm so you don\'t miss an important moment!</string>
+    <string name="time_left_hour_min">Alarm in %1$dh %2$dmin</string>
+    <string name="time_left_min">Alarm in %1$dmin</string>
+    <string name="save">Save</string>
+    <string name="alarm_name">Alarm Name</string>
+    <string name="turn_off">Turn Off</string>
+    <string name="overlay_permission_title">Overlay Permission</string>
+    <string name="overlay_permission_description">To show alarms on top of other apps, please grant the overlay permission.</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="cancel">Cancel</string>
+    <string name="permission_title">Permission required</string>
+    <string name="okay">Okay</string>
+    <string name="notification_rationale">In order to display the alarm as a notification, this app needs your permission for that. Please click on \"Okay\" to grant it.</string>
 </resources>
