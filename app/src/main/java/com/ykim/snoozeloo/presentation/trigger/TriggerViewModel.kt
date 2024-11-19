@@ -1,7 +1,9 @@
 package com.ykim.snoozeloo.presentation.trigger
 
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.RingtoneManager
+import android.provider.MediaStore.Audio
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -30,6 +32,10 @@ class TriggerViewModel @Inject constructor(
     private val ringtone = RingtoneManager.getRingtone(context, alarmUri)
 
     init {
+        ringtone.audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ALARM)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
         ringtone.play()
     }
 
