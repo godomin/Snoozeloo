@@ -45,7 +45,7 @@ fun TriggerScreenRoot(
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is TriggerEvent.TurnOffAlarm -> {
-                (context as? Activity)?.finish()
+                (context as? Activity)?.finishAffinity()
             }
         }
     }
