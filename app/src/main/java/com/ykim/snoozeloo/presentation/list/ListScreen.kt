@@ -1,8 +1,13 @@
 package com.ykim.snoozeloo.presentation.list
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +46,8 @@ import com.ykim.snoozeloo.presentation.components.ListCard
 import com.ykim.snoozeloo.presentation.components.SnoozelooButton
 import com.ykim.snoozeloo.presentation.components.SnoozelooFloatingActionButton
 import com.ykim.snoozeloo.presentation.model.Alarm
+import com.ykim.snoozeloo.presentation.util.hasNotificationPermission
+import com.ykim.snoozeloo.presentation.util.shouldShowNotificationRationale
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
 @Composable
@@ -66,6 +74,48 @@ private fun ListScreen(
     state: ListState,
     onAction: (ListAction) -> Unit
 ) {
+    val context = LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        val activity = context as ComponentActivity
+        val showRationale = activity.shouldShowNotificationRationale()
+        onAction(
+            ListAction.SubmitNotificationPermissionInfo(
+                showRationale = showRationale
+            )
+        )
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        val activity = context as ComponentActivity
+        val showRationale = activity.shouldShowNotificationRationale()
+
+        onAction(
+            ListAction.SubmitNotificationPermissionInfo(
+                showRationale = showRationale
+            )
+        )
+
+        if (!showRationale) {
+            permissionLauncher.requestPermissions(context)
+        }
+    }
+
+    if (state.shouldShowNotificationRationale) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(text = stringResource(id = R.string.permission_title)) },
+            text = { Text(text = stringResource(id = R.string.notification_rationale)) },
+            confirmButton = {
+                SnoozelooButton(
+                    text = stringResource(id = R.string.okay),
+                    onClick = { permissionLauncher.requestPermissions(context) }
+                )
+            }
+        )
+    }
+
     var showOverlayPermissionDialog by remember {
         mutableStateOf(!state.isOverlayPermissionGranted)
     }
@@ -118,7 +168,8 @@ private fun ListScreen(
                 }
             } else {
                 Spacer(modifier = Modifier.height(24.dp))
-                LazyColumn(                    modifier = Modifier,
+                LazyColumn(
+                    modifier = Modifier,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(state.alarmList) { alarm ->
@@ -171,6 +222,13 @@ fun OverlayPermissionDialog(
             )
         }
     )
+}
+
+private fun ActivityResultLauncher<String>.requestPermissions(context: Context) {
+    val hasPermission = context.hasNotificationPermission()
+    if (!hasPermission) {
+        launch(android.Manifest.permission.POST_NOTIFICATIONS)
+    }
 }
 
 @Preview(widthDp = 360, heightDp = 748)

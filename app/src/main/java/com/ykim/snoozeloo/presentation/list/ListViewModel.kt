@@ -44,6 +44,16 @@ class ListViewModel @Inject constructor(
         when (action) {
             is ListAction.OnAlarmToggleClick -> onAlarmToggle(action.alarm)
             is ListAction.CheckOverlayPermission -> checkOverlayPermissionGranted()
+            is ListAction.SubmitNotificationPermissionInfo -> {
+                state = state.copy(
+                    shouldShowNotificationRationale = action.showRationale
+                )
+            }
+            is ListAction.DismissRationaleDialog -> {
+                state = state.copy(
+                    shouldShowNotificationRationale = false
+                )
+            }
             else -> Unit
         }
     }

@@ -7,4 +7,6 @@ sealed interface ListAction {
     data class OnEditAlarmClick(val id: Int) : ListAction
     data class OnAlarmToggleClick(val alarm: Alarm) : ListAction
     data object CheckOverlayPermission : ListAction
+    data class SubmitNotificationPermissionInfo(val showRationale: Boolean) : ListAction
+    data object DismissRationaleDialog : ListAction
 }
