@@ -1,6 +1,8 @@
 package com.ykim.snoozeloo.presentation.list
 
 import android.content.Context
+import android.os.Build
+import android.provider.Settings
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -29,6 +31,7 @@ class ListViewModel @Inject constructor(
         private set
 
     init {
+        checkOverlayPermissionGranted()
         alarmRepository.getAlarms()
             .onEach { alarmDataList ->
                 state = state.copy(
@@ -40,6 +43,7 @@ class ListViewModel @Inject constructor(
     fun onAction(action: ListAction) {
         when (action) {
             is ListAction.OnAlarmToggleClick -> onAlarmToggle(action.alarm)
+            is ListAction.CheckOverlayPermission -> checkOverlayPermissionGranted()
             else -> Unit
         }
     }
@@ -63,5 +67,16 @@ class ListViewModel @Inject constructor(
         } else {
             context.cancelAlarm(alarm.id ?: 0)
         }
+    }
+
+    private fun checkOverlayPermissionGranted() {
+        val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Settings.canDrawOverlays(context)
+        } else {
+            true
+        }
+        state = state.copy(
+            isOverlayPermissionGranted = granted
+        )
     }
 }

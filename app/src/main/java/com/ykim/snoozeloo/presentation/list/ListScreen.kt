@@ -1,5 +1,8 @@
 package com.ykim.snoozeloo.presentation.list
 
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,15 +14,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -28,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ykim.snoozeloo.R
 import com.ykim.snoozeloo.presentation.components.ListCard
+import com.ykim.snoozeloo.presentation.components.SnoozelooButton
 import com.ykim.snoozeloo.presentation.components.SnoozelooFloatingActionButton
 import com.ykim.snoozeloo.presentation.model.Alarm
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
@@ -56,6 +66,14 @@ private fun ListScreen(
     state: ListState,
     onAction: (ListAction) -> Unit
 ) {
+    var showOverlayPermissionDialog by remember {
+        mutableStateOf(!state.isOverlayPermissionGranted)
+    }
+    if (showOverlayPermissionDialog) {
+        OverlayPermissionDialog(
+            onDismiss = { showOverlayPermissionDialog = false }
+        )
+    }
     Scaffold(
         floatingActionButton = {
             SnoozelooFloatingActionButton(
@@ -120,6 +138,39 @@ private fun ListScreen(
             }
         }
     }
+}
+
+@Composable
+fun OverlayPermissionDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(id = R.string.overlay_permission_title)) },
+        text = { Text(text = stringResource(id = R.string.overlay_permission_description)) },
+        confirmButton = {
+            SnoozelooButton(
+                text = stringResource(id = R.string.grant_permission),
+                onClick = {
+                    val intent = Intent(
+                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:${context.packageName}")
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    context.startActivity(intent)
+                }
+            )
+        },
+        dismissButton = {
+            SnoozelooButton(
+                text = stringResource(id = R.string.cancel),
+                onClick = onDismiss
+            )
+        }
+    )
 }
 
 @Preview(widthDp = 360, heightDp = 748)

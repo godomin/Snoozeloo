@@ -4,4 +4,5 @@ import com.ykim.snoozeloo.presentation.model.Alarm
 
 data class ListState(
     val alarmList: List<Alarm> = emptyList(),
+    val isOverlayPermissionGranted: Boolean = false,
 )
