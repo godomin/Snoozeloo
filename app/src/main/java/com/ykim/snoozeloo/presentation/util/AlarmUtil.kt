@@ -68,9 +68,16 @@ fun Context.showNotificationWithFullScreenIntent(receivedIntent: Intent?) {
     val intent = Intent(this, TriggerActivity::class.java).apply {
         receivedIntent?.extras?.let { putExtras(it) }
     }
-    val fullScreenIntent = PendingIntent.getActivity(this, 0, intent, 0)
+    val fullScreenIntent = PendingIntent.getActivity(
+        this,
+        0,
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
     val builder = NotificationCompat.Builder(this, CHANNEL_ID)
         .setContentTitle(getString(R.string.app_name))
+        .setContentText("content text")
+        .setSmallIcon(R.drawable.alarm)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setFullScreenIntent(fullScreenIntent, true)
 
@@ -83,7 +90,9 @@ private fun NotificationManager.buildChannel(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val name = context.getString(R.string.app_name)
         val importance = NotificationManager.IMPORTANCE_HIGH
-        val channel = NotificationChannel(CHANNEL_ID, name, importance)
+        val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+            description = "description"
+        }
         createNotificationChannel(channel)
     }
 }

@@ -54,7 +54,7 @@ fun Int.to12HourFormat(): Pair<String, String> {
 fun Int.to24HourFormat(): Pair<String, String> {
     val hour = this / 60
     val minute = this % 60
-    return hour.toString() to minute.toString()
+    return hour.toTwoDigitString() to minute.toTwoDigitString()
 }
 
 // "02:30 PM" -> "14", "30"
@@ -108,6 +108,10 @@ fun Int.timeLeft(context: Context): String {
     } else {
         context.getString(R.string.time_left_min, minute)
     }
+}
+
+private fun Int.toTwoDigitString(): String {
+    return String.format("%02d", this)
 }
 
 private fun getCurrentTimeInMinutes(): Int {
