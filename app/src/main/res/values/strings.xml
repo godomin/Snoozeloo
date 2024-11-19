@@ -6,4 +6,5 @@
     <string name="time_left_min">Alarm in %1$dmin</string>
     <string name="save">Save</string>
     <string name="alarm_name">Alarm Name</string>
+    <string name="turn_off">Turn Off</string>
 </resources>
