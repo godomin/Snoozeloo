@@ -9,4 +9,6 @@ sealed interface DetailAction {
     data class OnHourChange(val hour: String) : DetailAction
     data class OnMinuteChange(val minute: String) : DetailAction
     data class OnDayChange(val day: DaysOfWeek) : DetailAction
+    data class OnRingtoneClick(val ringtoneUri: String) : DetailAction
+    data class OnRingtoneChange(val ringtoneUri: String) : DetailAction
 }

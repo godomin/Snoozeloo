@@ -6,4 +6,5 @@ data class AlarmData(
     val time: Int,
     val enabled: Boolean,
     val enabledDays: Int = 0,
+    val ringtoneUri: String,
 )

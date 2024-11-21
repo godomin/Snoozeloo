@@ -10,6 +10,7 @@ data class AlarmEntity(
     val time: Int,
     val enabled: Boolean,
     val enableDays: Int = 0,
+    val ringtoneUri: String,
 ) {
     companion object {
         operator fun invoke(
@@ -17,18 +18,21 @@ data class AlarmEntity(
             name: String? = null,
             time: Int,
             enabled: Boolean,
-            enableDays: Int = 0
+            enableDays: Int = 0,
+            ringtoneUri: String,
         ) = if (id == null) AlarmEntity(
             name = name,
             time = time,
             enabled = enabled,
-            enableDays = enableDays
+            enableDays = enableDays,
+            ringtoneUri = ringtoneUri,
         ) else AlarmEntity(
             id = id,
             name = name,
             time = time,
             enabled = enabled,
-            enableDays = enableDays
+            enableDays = enableDays,
+            ringtoneUri = ringtoneUri,
         )
     }
 }

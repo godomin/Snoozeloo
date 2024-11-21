@@ -10,6 +10,7 @@ fun AlarmEntity.toAlarmData(): AlarmData {
         time = time,
         enabled = enabled,
         enabledDays = enableDays,
+        ringtoneUri = ringtoneUri,
     )
 }
 
@@ -20,5 +21,6 @@ fun AlarmData.toAlarmEntity(): AlarmEntity {
         time = time,
         enabled = enabled,
         enableDays = enabledDays,
+        ringtoneUri = ringtoneUri,
     )
 }

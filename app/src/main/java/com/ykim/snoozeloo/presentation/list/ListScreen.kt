@@ -248,7 +248,9 @@ private fun ListScreenPreview() {
                         "AM",
                         "Alarm in 30min",
                         "Go to bed at 02:20AM to get 8h of sleep",
-                        true
+                        true,
+                        0b1100101,
+                        "",
                     ),
                     Alarm(
                         "Education",
@@ -256,7 +258,9 @@ private fun ListScreenPreview() {
                         "PM",
                         "Alarm in 5h 30min",
                         "",
-                        false
+                        false,
+                        0b1100101,
+                        ""
                     )
                 )
             ),

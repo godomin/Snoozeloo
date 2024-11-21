@@ -8,9 +8,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.ykim.snoozeloo.Detail
+import com.ykim.snoozeloo.DetailScreen
 import com.ykim.snoozeloo.domain.AlarmRepository
 import com.ykim.snoozeloo.domain.model.AlarmData
+import com.ykim.snoozeloo.presentation.util.getDefaultRingtoneUri
+import com.ykim.snoozeloo.presentation.util.getRingtoneTitle
 import com.ykim.snoozeloo.presentation.util.registerAlarm
 import com.ykim.snoozeloo.presentation.util.timeLeft
 import com.ykim.snoozeloo.presentation.util.to24HourFormat
@@ -34,17 +36,20 @@ class DetailViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val detail = savedStateHandle.toRoute<Detail>()
-            detail.id?.let { id ->
+            val detailScreen = savedStateHandle.toRoute<DetailScreen>()
+            detailScreen.id?.let { id ->
                 val alarm = alarmRepository.getAlarm(id)
                 val (hour, minute) = alarm?.time?.to24HourFormat() ?: ("00" to "00")
+                val ringtoneUri = alarm?.ringtoneUri ?: getDefaultRingtoneUri().toString()
                 state = state.copy(
                     id = id,
                     name = alarm?.name ?: "",
                     hour = hour,
                     minute = minute,
                     enabled = alarm?.enabled ?: true,
-                    enabledDays = alarm?.enableDays ?: 0
+                    enabledDays = alarm?.enableDays ?: 0,
+                    ringtoneUri = ringtoneUri,
+                    ringtoneTitle = ringtoneUri.getRingtoneTitle(context)
                 )
                 checkValidTime(hour, minute)
             }
@@ -68,6 +73,13 @@ class DetailViewModel @Inject constructor(
             is DetailAction.OnDayChange -> {
                 state = state.copy(enabledDays = state.enabledDays.toggle(action.day))
             }
+
+            is DetailAction.OnRingtoneChange -> {
+                state = state.copy(
+                    ringtoneUri = action.ringtoneUri,
+                    ringtoneTitle = action.ringtoneUri.getRingtoneTitle(context)
+                )
+            }
             else -> Unit
         }
     }
@@ -86,7 +98,8 @@ class DetailViewModel @Inject constructor(
             name = state.name,
             time = "${state.hour}:${state.minute}".toMinutes(),
             enabled = state.enabled,
-            enabledDays = state.enabledDays
+            enabledDays = state.enabledDays,
+            ringtoneUri = state.ringtoneUri,
         )
         viewModelScope.launch {
             alarmRepository.updateAlarm(newAlarm)

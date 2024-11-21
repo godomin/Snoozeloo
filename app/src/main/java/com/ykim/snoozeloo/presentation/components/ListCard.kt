@@ -121,7 +121,8 @@ private fun ListCardPreview() {
                 "Alarm in 30min",
                 "",
                 true,
-                0b0110101
+                0b0110101,
+                ""
             )
         )
     }

@@ -8,5 +8,7 @@ data class DetailState(
     val enabled: Boolean = true,
     val enabledDays: Int = 0,
     val timeLeft: String = "",
+    val ringtoneTitle: String = "",
+    val ringtoneUri: String = "",
     val isValidTime: Boolean = false,
 )

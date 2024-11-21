@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -43,11 +44,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.SavedStateHandle
 import com.ykim.snoozeloo.R
 import com.ykim.snoozeloo.domain.DaysOfWeek
 import com.ykim.snoozeloo.presentation.components.SnoozelooButton
 import com.ykim.snoozeloo.presentation.components.SnoozelooChip
 import com.ykim.snoozeloo.presentation.components.SnoozelooDialog
+import com.ykim.snoozeloo.presentation.util.KEY_RINGTONE_URI
 import com.ykim.snoozeloo.presentation.util.addFocusCleaner
 import com.ykim.snoozeloo.presentation.util.getNameResourceId
 import com.ykim.snoozeloo.presentation.util.selected
@@ -55,14 +58,21 @@ import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
 @Composable
 fun DetailScreenRoot(
+    savedStateHandle: SavedStateHandle?,
     onCloseScreen: () -> Unit,
+    onRingtoneClick: (String) -> Unit,
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
+    val newRingtoneUri = savedStateHandle?.get<String>(KEY_RINGTONE_URI)
+    if (newRingtoneUri != null) {
+        viewModel.onAction(DetailAction.OnRingtoneChange(newRingtoneUri))
+    }
     DetailScreen(
         state = viewModel.state,
         onAction = { action ->
             when (action) {
                 DetailAction.OnClose, DetailAction.OnSave -> onCloseScreen()
+                is DetailAction.OnRingtoneClick -> onRingtoneClick( viewModel.state.ringtoneUri)
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -75,8 +85,9 @@ private fun DetailScreen(
     state: DetailState,
     onAction: (DetailAction) -> Unit
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    var showNameDialog by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -89,9 +100,9 @@ private fun DetailScreen(
                 .padding(16.dp)
                 .padding(padding)
         ) {
-            if (showDialog) {
+            if (showNameDialog) {
                 SnoozelooDialog(
-                    onDismiss = { showDialog = false },
+                    onDismiss = { showNameDialog = false },
                     onSave = { onAction(DetailAction.OnNameChange(it)) },
                     initialText = state.name
                 )
@@ -165,7 +176,7 @@ private fun DetailScreen(
                     .fillMaxWidth()
                     .clickable {
                         focusManager.clearFocus()
-                        showDialog = true
+                        showNameDialog = true
                     }
             ) {
                 Row(
@@ -212,9 +223,23 @@ private fun DetailScreen(
             WhiteCard(
                 innerPadding = 16.dp,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable { onAction(DetailAction.OnRingtoneClick(state.ringtoneUri)) },
             ) {
-
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.alarm_ringtone),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        text = state.ringtoneTitle,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
     }
@@ -317,7 +342,8 @@ private fun DetailScreenPreview() {
                 name = "Work",
                 isValidTime = true,
                 enabledDays = 0b0110101,
-                timeLeft = "Alarm in 3h 35m"
+                timeLeft = "Alarm in 3h 35m",
+                ringtoneTitle = "Default"
             ),
             onAction = {}
         )

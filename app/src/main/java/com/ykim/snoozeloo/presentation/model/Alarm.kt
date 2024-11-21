@@ -8,5 +8,6 @@ data class Alarm(
     val bedTimeLeft: String,
     val enabled: Boolean,
     val enabledDays: Int = 0,
+    val ringtoneUri: String,
     val id: Int? = null,
 )
