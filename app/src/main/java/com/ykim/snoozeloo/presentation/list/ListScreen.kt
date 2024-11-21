@@ -27,6 +27,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -112,9 +116,13 @@ private fun ListScreen(
         )
     }
 
-    if (!state.isOverlayPermissionGranted) {
+    var showRationaleDialog by remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = state.isOverlayPermissionGranted) {
+        showRationaleDialog = !state.isOverlayPermissionGranted
+    }
+    if (showRationaleDialog) {
         OverlayPermissionDialog(
-            onDismiss = {}
+            onDismiss = { showRationaleDialog = false }
         )
     }
     Scaffold(

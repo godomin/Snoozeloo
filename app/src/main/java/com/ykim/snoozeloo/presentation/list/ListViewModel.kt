@@ -44,7 +44,6 @@ class ListViewModel @Inject constructor(
     fun onAction(action: ListAction) {
         when (action) {
             is ListAction.OnAlarmToggleClick -> onAlarmToggle(action.alarm)
-            is ListAction.CheckOverlayPermission -> checkOverlayPermissionGranted()
             is ListAction.SubmitNotificationPermissionInfo -> {
                 state = state.copy(
                     shouldShowNotificationRationale = action.showRationale
@@ -81,11 +80,7 @@ class ListViewModel @Inject constructor(
     }
 
     private fun checkOverlayPermissionGranted() {
-        val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Settings.canDrawOverlays(context)
-        } else {
-            true
-        }
+        val granted = Settings.canDrawOverlays(context)
         state = state.copy(
             isOverlayPermissionGranted = granted
         )
