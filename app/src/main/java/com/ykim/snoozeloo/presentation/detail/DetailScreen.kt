@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.NavController
 import com.ykim.snoozeloo.R
 import com.ykim.snoozeloo.domain.DaysOfWeek
 import com.ykim.snoozeloo.presentation.components.SnoozelooButton
@@ -58,12 +59,12 @@ import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
 @Composable
 fun DetailScreenRoot(
-    savedStateHandle: SavedStateHandle?,
+    navController: NavController,
     onCloseScreen: () -> Unit,
     onRingtoneClick: (String) -> Unit,
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
-    val newRingtoneUri = savedStateHandle?.get<String>(KEY_RINGTONE_URI)
+    val newRingtoneUri = navController.currentBackStackEntry?.savedStateHandle?.get<String>(KEY_RINGTONE_URI)
     if (newRingtoneUri != null) {
         viewModel.onAction(DetailAction.OnRingtoneChange(newRingtoneUri))
     }

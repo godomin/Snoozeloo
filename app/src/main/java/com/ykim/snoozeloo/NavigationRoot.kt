@@ -26,9 +26,8 @@ fun NavigationRoot(
             )
         }
         composable<DetailScreen> {
-            val saveStateHandle = navController.currentBackStackEntry?.savedStateHandle
             DetailScreenRoot(
-                saveStateHandle,
+                navController,
                 onCloseScreen = {
                     navController.navigateUp()
                 },
