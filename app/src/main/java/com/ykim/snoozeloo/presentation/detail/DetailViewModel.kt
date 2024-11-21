@@ -11,11 +11,11 @@ import androidx.navigation.toRoute
 import com.ykim.snoozeloo.Detail
 import com.ykim.snoozeloo.domain.AlarmRepository
 import com.ykim.snoozeloo.domain.model.AlarmData
-import com.ykim.snoozeloo.presentation.timeLeft
-import com.ykim.snoozeloo.presentation.to24HourFormat
-import com.ykim.snoozeloo.presentation.toAlarm
-import com.ykim.snoozeloo.presentation.toMinutes
+import com.ykim.snoozeloo.presentation.util.toAlarm
 import com.ykim.snoozeloo.presentation.util.registerAlarm
+import com.ykim.snoozeloo.presentation.util.timeLeft
+import com.ykim.snoozeloo.presentation.util.to24HourFormat
+import com.ykim.snoozeloo.presentation.util.toMinutes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -57,10 +57,12 @@ class DetailViewModel @Inject constructor(
                 checkValidTime(action.hour, state.minute)
                 state = state.copy(hour = action.hour)
             }
+
             is DetailAction.OnMinuteChange -> {
                 checkValidTime(state.hour, action.minute)
                 state = state.copy(minute = action.minute)
             }
+
             else -> Unit
         }
     }

@@ -1,7 +1,6 @@
 package com.ykim.snoozeloo.presentation.list
 
 import android.content.Context
-import android.os.Build
 import android.provider.Settings
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,8 +9,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ykim.snoozeloo.domain.AlarmRepository
 import com.ykim.snoozeloo.presentation.model.Alarm
-import com.ykim.snoozeloo.presentation.toAlarm
-import com.ykim.snoozeloo.presentation.toAlarmData
+import com.ykim.snoozeloo.presentation.util.toAlarm
+import com.ykim.snoozeloo.presentation.util.toAlarmData
 import com.ykim.snoozeloo.presentation.util.cancelAlarm
 import com.ykim.snoozeloo.presentation.util.registerAlarm
 import dagger.hilt.android.lifecycle.HiltViewModel

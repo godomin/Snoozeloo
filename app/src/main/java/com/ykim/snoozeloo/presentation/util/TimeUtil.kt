@@ -1,10 +1,8 @@
-package com.ykim.snoozeloo.presentation
+package com.ykim.snoozeloo.presentation.util
 
 import android.content.Context
 import android.os.Build
 import com.ykim.snoozeloo.R
-import com.ykim.snoozeloo.domain.model.AlarmData
-import com.ykim.snoozeloo.presentation.model.Alarm
 import java.text.SimpleDateFormat
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -14,27 +12,6 @@ import java.util.Locale
 private const val FORMAT_12_HOUR = "hh:mm a"
 private const val FORMAT_24_HOUR = "HH:mm"
 private const val DAY_IN_MINUTES = 1440
-
-fun AlarmData.toAlarm(context: Context): Alarm {
-    val (time, period) = time.to12HourFormat()
-    return Alarm(
-        id = id,
-        name = name,
-        time = time,
-        period = period,
-        timeLeft = time.toMinutes(period).timeLeft(context),
-        enabled = enabled,
-    )
-}
-
-fun Alarm.toAlarmData(): AlarmData {
-    return AlarmData(
-        id = id,
-        name = name,
-        time = time.toMinutes(period),
-        enabled = enabled,
-    )
-}
 
 // 870 -> "02:30 PM"
 fun Int.to12HourFormat(): Pair<String, String> {

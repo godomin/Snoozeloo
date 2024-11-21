@@ -13,7 +13,6 @@ import com.ykim.snoozeloo.AlarmReceiver
 import com.ykim.snoozeloo.R
 import com.ykim.snoozeloo.presentation.TriggerActivity
 import com.ykim.snoozeloo.presentation.model.Alarm
-import com.ykim.snoozeloo.presentation.to24HourFormat
 import java.util.Calendar
 
 const val CHANNEL_ID = "SnoozelooChannelId"

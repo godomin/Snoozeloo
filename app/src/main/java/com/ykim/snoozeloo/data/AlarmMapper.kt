@@ -9,6 +9,7 @@ fun AlarmEntity.toAlarmData(): AlarmData {
         name = name,
         time = time,
         enabled = enabled,
+        enabledDays = enableDays,
     )
 }
 
@@ -18,5 +19,6 @@ fun AlarmData.toAlarmEntity(): AlarmEntity {
         name = name,
         time = time,
         enabled = enabled,
+        enableDays = enabledDays,
     )
 }

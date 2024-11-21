@@ -27,6 +27,12 @@ val Typography = Typography(
         fontSize = 14.sp,
         color = SnoozelooDarkGray
     ),
+    bodySmall = TextStyle(
+        fontFamily = montserrat,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        color = SnoozelooWhite
+    ),
     headlineMedium = TextStyle(
         fontFamily = montserrat,
         fontWeight = FontWeight.Normal,

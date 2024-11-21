@@ -5,4 +5,5 @@ data class AlarmData(
     val name: String? = null,
     val time: Int,
     val enabled: Boolean,
+    val enabledDays: Int = 0,
 )

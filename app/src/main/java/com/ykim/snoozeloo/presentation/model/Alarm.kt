@@ -6,5 +6,6 @@ data class Alarm(
     val period: String,
     val timeLeft: String,
     val enabled: Boolean,
+    val enabledDays: Int = 0,
     val id: Int? = null,
 )

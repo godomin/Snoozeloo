@@ -14,4 +14,11 @@
     <string name="permission_title">Permission required</string>
     <string name="okay">Okay</string>
     <string name="notification_rationale">In order to display the alarm as a notification, this app needs your permission for that. Please click on \"Okay\" to grant it.</string>
+    <string name="monday">Mo</string>
+    <string name="tuesday">Tu</string>
+    <string name="wednesday">We</string>
+    <string name="thursday">Th</string>
+    <string name="friday">Fr</string>
+    <string name="saturday">Sa</string>
+    <string name="sunday">Su</string>
 </resources>
