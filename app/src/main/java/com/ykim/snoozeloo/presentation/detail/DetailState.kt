@@ -6,6 +6,7 @@ data class DetailState(
     val minute: String = "",
     val name: String = "",
     val enabled: Boolean = true,
+    val enabledDays: Int = 0,
     val timeLeft: String = "",
     val isValidTime: Boolean = false,
 )

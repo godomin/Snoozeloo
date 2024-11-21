@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ykim.snoozeloo.domain.DaysOfWeek
 import com.ykim.snoozeloo.presentation.model.Alarm
+import com.ykim.snoozeloo.presentation.util.selected
 import com.ykim.snoozeloo.presentation.util.getNameResourceId
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
@@ -33,6 +33,7 @@ fun ListCard(
     modifier: Modifier = Modifier,
     data: Alarm,
     onToggle: () -> Unit = {},
+    onDaySelected: (DaysOfWeek) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -41,7 +42,7 @@ fun ListCard(
             .background(MaterialTheme.colorScheme.onPrimary)
             .padding(16.dp),
 
-    ) {
+        ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -88,7 +89,9 @@ fun ListCard(
         ) {
             DaysOfWeek.entries.forEach { day ->
                 SnoozelooChip(
-                    text = stringResource(id = day.getNameResourceId())
+                    text = stringResource(id = day.getNameResourceId()),
+                    selected = data.enabledDays.selected(day),
+                    onClick = { onDaySelected(day) }
                 )
             }
         }
@@ -118,7 +121,7 @@ private fun ListCardPreview() {
                 "Alarm in 30min",
                 "",
                 true,
-                0b1111100
+                0b0110101
             )
         )
     }

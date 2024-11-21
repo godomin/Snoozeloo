@@ -11,7 +11,7 @@ fun AlarmData.toAlarm(context: Context): Alarm {
         name = name,
         time = time,
         period = period,
-        timeLeft = time.toMinutes(period).timeLeft(context),
+        timeLeft = time.toMinutes(period).timeLeft(context, enabledDays),
         bedTimeLeft = time.toMinutes(period).bedTimeLeft(context, enabledDays),
         enabled = enabled,
         enabledDays = enabledDays,

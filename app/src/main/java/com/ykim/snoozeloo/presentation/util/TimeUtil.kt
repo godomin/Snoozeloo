@@ -9,6 +9,8 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
+import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val FORMAT_12_HOUR = "hh:mm a"
 private const val FORMAT_24_HOUR = "HH:mm"
@@ -88,16 +90,19 @@ fun String.toMinutes(): Int {
     }
 }
 
-fun Int.timeLeft(context: Context): String {
-    val now = getCurrentTimeInMinutes()
-    val timeLeft = if (this > now) {
-        this - now
-    } else {
-        this - now + DAY_IN_MINUTES
+fun Int.timeLeft(context: Context, enabledDays: Int): String {
+    val now = Calendar.getInstance().apply {
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
     }
-    val hour = timeLeft / 60
-    val minute = timeLeft % 60
-    return if (hour > 0) {
+    val closestDate = getClosestDate(now, this / 60, this % 60, enabledDays)
+    val diffMillis = closestDate.timeInMillis - now.timeInMillis
+    val day = TimeUnit.MILLISECONDS.toDays(diffMillis)
+    val hour = TimeUnit.MILLISECONDS.toHours(diffMillis) % 24
+    val minute = TimeUnit.MILLISECONDS.toMinutes(diffMillis) % 60
+    return if (day > 0) {
+        context.getString(R.string.time_left_day_hour_min, day, hour, minute)
+    } else if (hour > 0) {
         context.getString(R.string.time_left_hour_min, hour, minute)
     } else {
         context.getString(R.string.time_left_min, minute)
@@ -134,4 +139,40 @@ private fun getCurrentTimeInMinutes(): Int {
         val minute = calendar.get(Calendar.MINUTE)
         return hourOfDay * 60 + minute
     }
+}
+
+fun getClosestDate(
+    now: Calendar,
+    hour: Int,
+    minute: Int,
+    enabledDays: Int
+): Calendar {
+    val targetDays = enabledDays.getEnabledDays()
+    val closestDate = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, hour)
+        set(Calendar.MINUTE, minute)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
+
+    var minDiff = Long.MAX_VALUE
+    for (day in targetDays) {
+        val targetDate = Calendar.getInstance().apply {
+            set(Calendar.DAY_OF_WEEK, day)
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        if (targetDate.before(now)) {
+            targetDate.add(Calendar.WEEK_OF_YEAR, 1)
+        }
+
+        val diff = targetDate.timeInMillis - now.timeInMillis
+        if (diff < minDiff) {
+            minDiff = diff
+            closestDate.timeInMillis = targetDate.timeInMillis
+        }
+    }
+    return closestDate
 }

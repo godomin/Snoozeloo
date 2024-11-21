@@ -2,6 +2,7 @@
     <string name="app_name">Snoozeloo</string>
     <string name="alarm_list_title">Your Alarms</string>
     <string name="alarm_list_empty">It\'s empty! Add the first alarm so you don\'t miss an important moment!</string>
+    <string name="time_left_day_hour_min">Alarm in %1$dd %2$dh %3$dmin</string>
     <string name="time_left_hour_min">Alarm in %1$dh %2$dmin</string>
     <string name="time_left_min">Alarm in %1$dmin</string>
     <string name="save">Save</string>
@@ -21,5 +22,6 @@
     <string name="friday">Fr</string>
     <string name="saturday">Sa</string>
     <string name="sunday">Su</string>
-    <string name="bed_time_left">Go to bed at %1$s to get 8h of sleep</string>"
+    <string name="bed_time_left">Go to bed at %1$s to get 8h of sleep</string>
+    <string name="repeat">Repeat</string>"
 </resources>

@@ -23,14 +23,7 @@ const val ALARM_TIME = "alarmTime"
 fun Context.registerAlarm(alarm: Alarm) {
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val (hour, minute) = alarm.time.to24HourFormat(alarm.period)
-    val calendar = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, hour.toInt())
-        set(Calendar.MINUTE, minute.toInt())
-        set(Calendar.SECOND, 0)
-        if (before(Calendar.getInstance())) {
-            add(Calendar.DATE, 1)
-        }
-    }
+    val closestTime = getClosestDate(Calendar.getInstance(), hour.toInt(), minute.toInt(), alarm.enabledDays)
 
     val intent = Intent(this, AlarmReceiver::class.java).apply {
         putExtra(ALARM_ID, alarm.id)
@@ -46,7 +39,7 @@ fun Context.registerAlarm(alarm: Alarm) {
 
     alarmManager.setExactAndAllowWhileIdle(
         AlarmManager.RTC_WAKEUP,
-        calendar.timeInMillis,
+        closestTime.timeInMillis,
         pendingIntent
     )
 }

@@ -44,9 +44,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ykim.snoozeloo.R
+import com.ykim.snoozeloo.domain.DaysOfWeek
 import com.ykim.snoozeloo.presentation.components.SnoozelooButton
+import com.ykim.snoozeloo.presentation.components.SnoozelooChip
 import com.ykim.snoozeloo.presentation.components.SnoozelooDialog
 import com.ykim.snoozeloo.presentation.util.addFocusCleaner
+import com.ykim.snoozeloo.presentation.util.getNameResourceId
+import com.ykim.snoozeloo.presentation.util.selected
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
 @Composable
@@ -116,7 +120,8 @@ private fun DetailScreen(
             WhiteCard(
                 innerPadding = 24.dp,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -161,7 +166,7 @@ private fun DetailScreen(
                     .clickable {
                         focusManager.clearFocus()
                         showDialog = true
-                    },
+                    }
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -178,7 +183,39 @@ private fun DetailScreen(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            WhiteCard(
+                innerPadding = 16.dp,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.repeat),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                ) {
+                    DaysOfWeek.entries.forEach { day ->
+                        SnoozelooChip(
+                            text = stringResource(id = day.getNameResourceId()),
+                            selected = state.enabledDays.selected(day),
+                            onClick = { onAction(DetailAction.OnDayChange(day)) }
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            WhiteCard(
+                innerPadding = 16.dp,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            ) {
+
+            }
         }
     }
 }
@@ -187,6 +224,7 @@ private fun DetailScreen(
 fun WhiteCard(
     innerPadding: Dp = 0.dp,
     modifier: Modifier = Modifier,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     composable: @Composable () -> Unit
 ) {
     Column(
@@ -194,7 +232,7 @@ fun WhiteCard(
             .clip(RoundedCornerShape(10.dp))
             .background(MaterialTheme.colorScheme.onPrimary)
             .padding(innerPadding),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = horizontalAlignment
     ) {
         composable()
     }
@@ -277,7 +315,9 @@ private fun DetailScreenPreview() {
                 hour = "10",
                 minute = "00",
                 name = "Work",
-                isValidTime = true
+                isValidTime = true,
+                enabledDays = 0b0110101,
+                timeLeft = "Alarm in 3h 35m"
             ),
             onAction = {}
         )

@@ -1,11 +1,13 @@
 package com.ykim.snoozeloo.domain
 
-enum class DaysOfWeek(val mask: Int) {
-    MONDAY(1 shl 0),
-    TUESDAY(1 shl 1),
-    WEDNESDAY(1 shl 2),
-    THURSDAY(1 shl 3),
-    FRIDAY(1 shl 4),
-    SATURDAY(1 shl 5),
-    SUNDAY(1 shl 6)
+import java.util.Calendar
+
+enum class DaysOfWeek(val mask: Int, val calendarDay: Int) {
+    MONDAY(1 shl 0, Calendar.MONDAY),
+    TUESDAY(1 shl 1, Calendar.TUESDAY),
+    WEDNESDAY(1 shl 2, Calendar.WEDNESDAY),
+    THURSDAY(1 shl 3, Calendar.THURSDAY),
+    FRIDAY(1 shl 4, Calendar.FRIDAY),
+    SATURDAY(1 shl 5, Calendar.SATURDAY),
+    SUNDAY(1 shl 6, Calendar.SUNDAY)
 }
