@@ -92,10 +92,10 @@ fun ListCard(
                 )
             }
         }
-        if (true) {
+        if (data.bedTimeLeft.isNotEmpty()) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = data.timeLeft,
+                text = data.bedTimeLeft,
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -116,7 +116,9 @@ private fun ListCardPreview() {
                 "10:00",
                 "AM",
                 "Alarm in 30min",
-                true
+                "",
+                true,
+                0b1111100
             )
         )
     }

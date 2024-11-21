@@ -3,6 +3,7 @@ package com.ykim.snoozeloo.presentation.util
 import android.content.Context
 import android.os.Build
 import com.ykim.snoozeloo.R
+import com.ykim.snoozeloo.domain.DaysOfWeek
 import java.text.SimpleDateFormat
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -12,6 +13,9 @@ import java.util.Locale
 private const val FORMAT_12_HOUR = "hh:mm a"
 private const val FORMAT_24_HOUR = "HH:mm"
 private const val DAY_IN_MINUTES = 1440
+private const val FOUR_AM_IN_MINUTES = 240
+private const val TEN_AM_IN_MINUTES = 600
+private const val EIGHT_HOUR_IN_MINUTES = 480
 
 // 870 -> "02:30 PM"
 fun Int.to12HourFormat(): Pair<String, String> {
@@ -37,12 +41,21 @@ fun Int.to24HourFormat(): Pair<String, String> {
 // "02:30 PM" -> "14", "30"
 fun String.to24HourFormat(period: String): Pair<String, String> {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val time = LocalTime.parse("$this $period", DateTimeFormatter.ofPattern(FORMAT_12_HOUR, Locale.ENGLISH))
-        val (hour, minute) = time.format(DateTimeFormatter.ofPattern(FORMAT_24_HOUR, Locale.ENGLISH)).split(":")
+        val time = LocalTime.parse(
+            "$this $period",
+            DateTimeFormatter.ofPattern(FORMAT_12_HOUR, Locale.ENGLISH)
+        )
+        val (hour, minute) = time.format(
+            DateTimeFormatter.ofPattern(
+                FORMAT_24_HOUR,
+                Locale.ENGLISH
+            )
+        ).split(":")
         hour to minute
     } else {
         val date = SimpleDateFormat(FORMAT_12_HOUR, Locale.ENGLISH).parse("$this $period")
-        val (hour, minute) = SimpleDateFormat(FORMAT_24_HOUR, Locale.ENGLISH).format(date).split(":")
+        val (hour, minute) = SimpleDateFormat(FORMAT_24_HOUR, Locale.ENGLISH).format(date)
+            .split(":")
         hour to minute
     }
 }
@@ -50,7 +63,10 @@ fun String.to24HourFormat(period: String): Pair<String, String> {
 // "02:30 PM" -> 870
 fun String.toMinutes(period: String): Int {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val time = LocalTime.parse("$this $period", DateTimeFormatter.ofPattern(FORMAT_12_HOUR, Locale.ENGLISH))
+        val time = LocalTime.parse(
+            "$this $period",
+            DateTimeFormatter.ofPattern(FORMAT_12_HOUR, Locale.ENGLISH)
+        )
         time.hour * 60 + time.minute
     } else {
         val date = SimpleDateFormat(FORMAT_12_HOUR, Locale.ENGLISH).parse("$this $period")
@@ -62,7 +78,8 @@ fun String.toMinutes(period: String): Int {
 // "14:30" -> 870
 fun String.toMinutes(): Int {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val time = LocalTime.parse(this, DateTimeFormatter.ofPattern(FORMAT_24_HOUR, Locale.ENGLISH))
+        val time =
+            LocalTime.parse(this, DateTimeFormatter.ofPattern(FORMAT_24_HOUR, Locale.ENGLISH))
         time.hour * 60 + time.minute
     } else {
         val date = SimpleDateFormat(FORMAT_12_HOUR, Locale.ENGLISH).parse(this)
@@ -84,6 +101,22 @@ fun Int.timeLeft(context: Context): String {
         context.getString(R.string.time_left_hour_min, hour, minute)
     } else {
         context.getString(R.string.time_left_min, minute)
+    }
+}
+
+fun Int.bedTimeLeft(context: Context, enabledDays: Int): String {
+    return if (enabledDays.weekdayEnabled() && this in FOUR_AM_IN_MINUTES..TEN_AM_IN_MINUTES) {
+        val now = getCurrentTimeInMinutes()
+        val timeLeft = (this - now + DAY_IN_MINUTES) % DAY_IN_MINUTES
+        if (timeLeft >= EIGHT_HOUR_IN_MINUTES) {
+            val bedTime = (this - EIGHT_HOUR_IN_MINUTES + DAY_IN_MINUTES) % DAY_IN_MINUTES
+            val bedTimeStr = bedTime.to12HourFormat().toList().joinToString("")
+            context.getString(R.string.bed_time_left, bedTimeStr)
+        } else {
+            ""
+        }
+    } else {
+        ""
     }
 }
 

@@ -14,3 +14,12 @@ fun DaysOfWeek.getNameResourceId(): Int {
         DaysOfWeek.SUNDAY -> R.string.sunday
     }
 }
+
+fun Int.weekdayEnabled(): Boolean {
+    val weekdayMask = DaysOfWeek.MONDAY.mask or
+            DaysOfWeek.TUESDAY.mask or
+            DaysOfWeek.WEDNESDAY.mask or
+            DaysOfWeek.THURSDAY.mask or
+            DaysOfWeek.FRIDAY.mask
+    return (this and weekdayMask) != 0
+}
