@@ -37,6 +37,7 @@ class ListViewModel @Inject constructor(
                 state = state.copy(
                     alarmList = alarmDataList.map { it.toAlarm(context) }
                 )
+                state = state.copy(isLoading = false)
             }.launchIn(viewModelScope)
     }
 

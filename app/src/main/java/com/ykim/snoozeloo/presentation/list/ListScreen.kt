@@ -50,7 +50,7 @@ import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 fun ListScreenRoot(
     onItemClick: (Int) -> Unit,
     onAddClick: () -> Unit,
-    viewModel: ListViewModel = hiltViewModel(),
+    viewModel: ListViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
 ) {
     ListScreen(
         state = viewModel.state,
@@ -138,7 +138,7 @@ private fun ListScreen(
                 text = stringResource(id = R.string.alarm_list_title),
                 style = MaterialTheme.typography.headlineMedium
             )
-            if (state.alarmList.isEmpty()) {
+            if (state.alarmList.isEmpty() && !state.isLoading) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
