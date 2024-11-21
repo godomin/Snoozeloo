@@ -54,7 +54,7 @@ import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 fun ListScreenRoot(
     onItemClick: (Int) -> Unit,
     onAddClick: () -> Unit,
-    viewModel: ListViewModel = hiltViewModel(),
+    viewModel: ListViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
 ) {
     ListScreen(
         state = viewModel.state,
@@ -116,9 +116,13 @@ private fun ListScreen(
         )
     }
 
-    if (!state.isOverlayPermissionGranted) {
+    var showRationaleDialog by remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = state.isOverlayPermissionGranted) {
+        showRationaleDialog = !state.isOverlayPermissionGranted
+    }
+    if (showRationaleDialog) {
         OverlayPermissionDialog(
-            onDismiss = {}
+            onDismiss = { showRationaleDialog = false }
         )
     }
     Scaffold(
@@ -142,7 +146,7 @@ private fun ListScreen(
                 text = stringResource(id = R.string.alarm_list_title),
                 style = MaterialTheme.typography.headlineMedium
             )
-            if (state.alarmList.isEmpty()) {
+            if (state.alarmList.isEmpty() && !state.isLoading) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -151,7 +155,7 @@ private fun ListScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.alarm),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.alarm_icon),
                         contentDescription = "",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(62.dp)
@@ -169,7 +173,10 @@ private fun ListScreen(
                     modifier = Modifier,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(state.alarmList) { alarm ->
+                    items(
+                        items = state.alarmList,
+                        key = { alarm -> alarm.id ?: 0 }
+                    ) { alarm ->
                         ListCard(
                             modifier = Modifier.clickable {
                                 alarm.id?.let { id ->

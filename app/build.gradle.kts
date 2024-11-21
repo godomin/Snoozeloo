@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.core.splashscreen)
 
     // hilt
     implementation(libs.hilt.android)

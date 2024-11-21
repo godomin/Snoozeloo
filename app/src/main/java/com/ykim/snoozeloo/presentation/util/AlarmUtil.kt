@@ -71,7 +71,7 @@ fun Context.showNotificationWithFullScreenIntent(receivedIntent: Intent?) {
     val builder = NotificationCompat.Builder(this, CHANNEL_ID)
         .setContentTitle(getString(R.string.app_name))
         .setContentText("content text")
-        .setSmallIcon(R.drawable.alarm)
+        .setSmallIcon(R.drawable.alarm_icon)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setAutoCancel(true)
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
