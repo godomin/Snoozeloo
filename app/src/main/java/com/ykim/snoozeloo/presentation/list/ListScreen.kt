@@ -173,7 +173,10 @@ private fun ListScreen(
                     modifier = Modifier,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(state.alarmList) { alarm ->
+                    items(
+                        items = state.alarmList,
+                        key = { alarm -> alarm.id ?: 0 }
+                    ) { alarm ->
                         ListCard(
                             modifier = Modifier.clickable {
                                 alarm.id?.let { id ->
