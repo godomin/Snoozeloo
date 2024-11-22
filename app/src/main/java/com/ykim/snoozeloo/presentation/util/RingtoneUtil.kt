@@ -3,8 +3,9 @@ package com.ykim.snoozeloo.presentation.util
 import android.content.Context
 import android.media.RingtoneManager
 import android.net.Uri
+import com.ykim.snoozeloo.presentation.model.Ringtone
 
-const val KEY_RINGTONE_URI = "ringtoneUri"
+const val KEY_RINGTONE_URI = "ringtone"
 
 fun String.getRingtoneTitle(context: Context): String {
     val uri = if (isValidUri(context)) Uri.parse(this) else getDefaultRingtoneUri()
@@ -22,6 +23,11 @@ fun String.isValidUri(context: Context): Boolean {
     }
 }
 
-fun getDefaultRingtoneUri(): Uri {
+private fun getDefaultRingtoneUri(): Uri {
     return RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+}
+
+fun getDefaultRingtone(context: Context): Ringtone {
+    val defaultUri = getDefaultRingtoneUri().toString()
+    return Ringtone.Normal(defaultUri.getRingtoneTitle(context), defaultUri)
 }

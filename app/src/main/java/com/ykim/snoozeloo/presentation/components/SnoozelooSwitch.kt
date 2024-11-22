@@ -38,7 +38,7 @@ fun SnoozelooSwitch(
     )
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(24.dp))
             .background(if (checked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer)
             .size(width = 51.dp, height = 30.dp)

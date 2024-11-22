@@ -3,7 +3,6 @@ package com.ykim.snoozeloo.presentation.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,11 +22,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ykim.snoozeloo.domain.DaysOfWeek
 import com.ykim.snoozeloo.presentation.model.Alarm
-import com.ykim.snoozeloo.presentation.util.selected
+import com.ykim.snoozeloo.presentation.model.Ringtone
 import com.ykim.snoozeloo.presentation.util.getNameResourceId
+import com.ykim.snoozeloo.presentation.util.selected
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ListCard(
     modifier: Modifier = Modifier,
@@ -122,7 +121,9 @@ private fun ListCardPreview() {
                 "",
                 true,
                 0b0110101,
-                ""
+                Ringtone.Normal("Silent", ""),
+                100,
+                true
             )
         )
     }

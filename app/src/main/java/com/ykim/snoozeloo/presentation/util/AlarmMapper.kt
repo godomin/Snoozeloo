@@ -2,7 +2,9 @@ package com.ykim.snoozeloo.presentation.util
 
 import android.content.Context
 import com.ykim.snoozeloo.domain.model.AlarmData
+import com.ykim.snoozeloo.domain.model.RingtoneData
 import com.ykim.snoozeloo.presentation.model.Alarm
+import com.ykim.snoozeloo.presentation.model.Ringtone
 
 fun AlarmData.toAlarm(context: Context): Alarm {
     val (time, period) = time.to12HourFormat()
@@ -15,7 +17,9 @@ fun AlarmData.toAlarm(context: Context): Alarm {
         bedTimeLeft = time.toMinutes(period).bedTimeLeft(context, enabledDays),
         enabled = enabled,
         enabledDays = enabledDays,
-        ringtoneUri = ringtoneUri,
+        ringtone = ringtone.toRingtone(context),
+        volume = volume,
+        isVibrate = isVibrate
     )
 }
 
@@ -26,6 +30,22 @@ fun Alarm.toAlarmData(): AlarmData {
         time = time.toMinutes(period),
         enabled = enabled,
         enabledDays = enabledDays,
-        ringtoneUri = ringtoneUri,
+        ringtone = ringtone.toRingtoneData(),
+        volume = volume,
+        isVibrate = isVibrate,
     )
+}
+
+private fun RingtoneData.toRingtone(context: Context): Ringtone {
+    return when (this) {
+        is RingtoneData.Ringtone -> Ringtone.Normal(uri.getRingtoneTitle(context), uri)
+        is RingtoneData.Silent -> Ringtone.Silent
+    }
+}
+
+fun Ringtone.toRingtoneData(): RingtoneData {
+    return when (this) {
+        is Ringtone.Normal -> RingtoneData.Ringtone(uri)
+        is Ringtone.Silent -> RingtoneData.Silent
+    }
 }

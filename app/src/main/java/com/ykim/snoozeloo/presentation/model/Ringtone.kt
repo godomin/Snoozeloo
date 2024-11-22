@@ -1,6 +1,6 @@
 package com.ykim.snoozeloo.presentation.model
 
-data class Ringtone(
-    val title: String,
-    val uri: String
-)
+sealed class Ringtone {
+    data class Normal(val title: String, val uri: String) : Ringtone()
+    data object Silent : Ringtone()
+}

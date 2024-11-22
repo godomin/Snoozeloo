@@ -9,23 +9,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ykim.snoozeloo.presentation.components.SnoozelooButton
+import com.ykim.snoozeloo.presentation.model.Ringtone
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
 @Composable
 fun RingtoneScreenRoot(
-    onBackPress: (String) -> Unit,
+    onBackPress: (Ringtone) -> Unit,
     viewModel: RingtoneViewModel = hiltViewModel(),
 ) {
     RingtoneScreen(
         state = viewModel.state,
-        //onAction = viewModel::onAction
+        onAction = viewModel::onAction
     )
 }
 
 @Composable
 private fun RingtoneScreen(
     state: RingtoneState,
-    //onAction: (DetailAction) -> Unit
+    onAction: (RingtoneAction) -> Unit
 ) {
 
 }
@@ -36,7 +37,7 @@ private fun RingtoneScreenPreview() {
     SnoozelooTheme {
         RingtoneScreen(
             state = RingtoneState(),
-            //onAction = {}
+            onAction = {}
         )
     }
 }

@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ykim.snoozeloo.presentation.detail.DetailScreenRoot
 import com.ykim.snoozeloo.presentation.list.ListScreenRoot
+import com.ykim.snoozeloo.presentation.model.Ringtone
 import com.ykim.snoozeloo.presentation.ringtone.RingtoneScreenRoot
 import com.ykim.snoozeloo.presentation.util.KEY_RINGTONE_URI
 import kotlinx.serialization.Serializable
@@ -38,10 +39,10 @@ fun NavigationRoot(
         }
         composable<RingtoneScreen> {
             RingtoneScreenRoot(
-                onBackPress = { ringtoneUri ->
+                onBackPress = { ringtone ->
                     navController.previousBackStackEntry?.savedStateHandle?.set(
                         KEY_RINGTONE_URI,
-                        ringtoneUri
+                        ringtone
                     )
                     navController.popBackStack<DetailScreen>(false)
                 }

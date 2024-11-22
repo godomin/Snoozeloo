@@ -24,5 +24,6 @@
     <string name="sunday">Su</string>
     <string name="bed_time_left">Go to bed at %1$s to get 8h of sleep</string>
     <string name="repeat">Repeat</string>
-    <string name="alarm_ringtone">Alarm ringtone</string>"
+    <string name="alarm_ringtone">Alarm ringtone</string>
+    <string name="silent">Silent</string>"
 </resources>

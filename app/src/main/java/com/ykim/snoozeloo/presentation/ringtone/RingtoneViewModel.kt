@@ -24,9 +24,13 @@ class RingtoneViewModel @Inject constructor(
         private set
 
     init {
-        val selectedUri = savedStateHandle.toRoute<RingtoneScreen>().ringtoneUri
-        state = state.copy(selectedUri = selectedUri)
+        val ringtone = savedStateHandle.toRoute<RingtoneScreen>().ringtoneUri
+        state = state.copy(selectedUri = ringtone)
         getRingtones(context)
+    }
+
+    fun onAction(action: RingtoneAction) {
+
     }
 
     private fun getRingtones(context: Context) {
@@ -38,7 +42,7 @@ class RingtoneViewModel @Inject constructor(
         while (cursor.moveToNext()) {
             val title = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX)
             val uri = ringtoneManager.getRingtoneUri(cursor.position)
-            list.add(Ringtone(title, uri.toString()))
+            list.add(Ringtone.Normal(title, uri.toString()))
         }
         cursor.close()
         state = state.copy(ringtoneList = list)

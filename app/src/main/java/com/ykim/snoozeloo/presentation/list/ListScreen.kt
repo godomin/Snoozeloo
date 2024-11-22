@@ -46,6 +46,7 @@ import com.ykim.snoozeloo.presentation.components.ListCard
 import com.ykim.snoozeloo.presentation.components.SnoozelooButton
 import com.ykim.snoozeloo.presentation.components.SnoozelooFloatingActionButton
 import com.ykim.snoozeloo.presentation.model.Alarm
+import com.ykim.snoozeloo.presentation.model.Ringtone
 import com.ykim.snoozeloo.presentation.util.hasNotificationPermission
 import com.ykim.snoozeloo.presentation.util.shouldShowNotificationRationale
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
@@ -250,7 +251,9 @@ private fun ListScreenPreview() {
                         "Go to bed at 02:20AM to get 8h of sleep",
                         true,
                         0b1100101,
-                        "",
+                        Ringtone.Silent,
+                        60,
+                        true
                     ),
                     Alarm(
                         "Education",
@@ -260,7 +263,9 @@ private fun ListScreenPreview() {
                         "",
                         false,
                         0b1100101,
-                        ""
+                        Ringtone.Normal("Silent", ""),
+                        32,
+                        false
                     )
                 )
             ),

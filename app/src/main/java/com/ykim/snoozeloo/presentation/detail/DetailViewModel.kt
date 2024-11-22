@@ -9,15 +9,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.ykim.snoozeloo.DetailScreen
+import com.ykim.snoozeloo.R
 import com.ykim.snoozeloo.domain.AlarmRepository
 import com.ykim.snoozeloo.domain.model.AlarmData
-import com.ykim.snoozeloo.presentation.util.getDefaultRingtoneUri
+import com.ykim.snoozeloo.presentation.model.Ringtone
+import com.ykim.snoozeloo.presentation.util.getDefaultRingtone
 import com.ykim.snoozeloo.presentation.util.getRingtoneTitle
 import com.ykim.snoozeloo.presentation.util.registerAlarm
 import com.ykim.snoozeloo.presentation.util.timeLeft
 import com.ykim.snoozeloo.presentation.util.to24HourFormat
 import com.ykim.snoozeloo.presentation.util.toAlarm
 import com.ykim.snoozeloo.presentation.util.toMinutes
+import com.ykim.snoozeloo.presentation.util.toRingtoneData
 import com.ykim.snoozeloo.presentation.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -38,18 +41,18 @@ class DetailViewModel @Inject constructor(
         viewModelScope.launch {
             val detailScreen = savedStateHandle.toRoute<DetailScreen>()
             detailScreen.id?.let { id ->
-                val alarm = alarmRepository.getAlarm(id)
-                val (hour, minute) = alarm?.time?.to24HourFormat() ?: ("00" to "00")
-                val ringtoneUri = alarm?.ringtoneUri ?: getDefaultRingtoneUri().toString()
+                val alarm = alarmRepository.getAlarm(id)?.toAlarm(context)
+                val (hour, minute) = alarm?.time?.to24HourFormat(alarm.period) ?: ("00" to "00")
+                val ringtone = alarm?.ringtone ?: getDefaultRingtone(context)
                 state = state.copy(
                     id = id,
                     name = alarm?.name ?: "",
                     hour = hour,
                     minute = minute,
                     enabled = alarm?.enabled ?: true,
-                    enabledDays = alarm?.enableDays ?: 0,
-                    ringtoneUri = ringtoneUri,
-                    ringtoneTitle = ringtoneUri.getRingtoneTitle(context)
+                    enabledDays = alarm?.enabledDays ?: 0,
+                    ringtoneUri = getRingtoneUri(ringtone),
+                    ringtoneTitle = getRingtoneTitle(ringtone)
                 )
                 checkValidTime(hour, minute)
             }
@@ -80,6 +83,7 @@ class DetailViewModel @Inject constructor(
                     ringtoneTitle = action.ringtoneUri.getRingtoneTitle(context)
                 )
             }
+
             else -> Unit
         }
     }
@@ -99,11 +103,32 @@ class DetailViewModel @Inject constructor(
             time = "${state.hour}:${state.minute}".toMinutes(),
             enabled = state.enabled,
             enabledDays = state.enabledDays,
-            ringtoneUri = state.ringtoneUri,
+            ringtone = getRingtone().toRingtoneData(),
         )
         viewModelScope.launch {
             alarmRepository.updateAlarm(newAlarm)
         }
         context.registerAlarm(newAlarm.toAlarm(context))
+    }
+
+    private fun getRingtoneTitle(ringtone: Ringtone): String {
+        return when (ringtone) {
+            is Ringtone.Normal -> ringtone.title
+            Ringtone.Silent -> context.getString(R.string.silent)
+        }
+    }
+
+    private fun getRingtoneUri(ringtone: Ringtone): String {
+        return when (ringtone) {
+            is Ringtone.Normal -> ringtone.uri
+            Ringtone.Silent -> ""
+        }
+    }
+
+    private fun getRingtone(): Ringtone {
+        return when (state.ringtoneUri) {
+            "" -> Ringtone.Silent
+            else -> Ringtone.Normal(state.ringtoneTitle, state.ringtoneUri)
+        }
     }
 }
