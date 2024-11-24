@@ -74,9 +74,10 @@ class ListViewModel @Inject constructor(
             alarmRepository.updateAlarm(toggledAlarm.toAlarmData())
         }
         if (toggledAlarm.enabled) {
+            alarm.id?.let { context.cancelAlarm(it) }
             context.registerAlarm(toggledAlarm)
         } else {
-            context.cancelAlarm(alarm.id ?: 0)
+            alarm.id?.let { context.cancelAlarm(it) }
         }
     }
 

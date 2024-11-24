@@ -12,6 +12,7 @@ import com.ykim.snoozeloo.DetailScreen
 import com.ykim.snoozeloo.domain.AlarmRepository
 import com.ykim.snoozeloo.domain.model.AlarmData
 import com.ykim.snoozeloo.presentation.model.Ringtone
+import com.ykim.snoozeloo.presentation.util.cancelAlarm
 import com.ykim.snoozeloo.presentation.util.getDefaultRingtone
 import com.ykim.snoozeloo.presentation.util.getRingtoneTitle
 import com.ykim.snoozeloo.presentation.util.getTitle
@@ -115,7 +116,10 @@ class DetailViewModel @Inject constructor(
         viewModelScope.launch {
             alarmRepository.updateAlarm(newAlarm)
         }
-        context.registerAlarm(newAlarm.toAlarm(context))
+        if (newAlarm.enabled) {
+            newAlarm.id?.let { context.cancelAlarm(it) }
+            context.registerAlarm(newAlarm.toAlarm(context))
+        }
     }
 
     private fun getRingtone(): Ringtone {
