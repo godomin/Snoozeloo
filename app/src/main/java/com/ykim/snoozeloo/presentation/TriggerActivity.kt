@@ -7,7 +7,10 @@ import androidx.activity.enableEdgeToEdge
 import com.ykim.snoozeloo.presentation.trigger.TriggerScreenRoot
 import com.ykim.snoozeloo.presentation.util.ALARM_ID
 import com.ykim.snoozeloo.presentation.util.ALARM_NAME
+import com.ykim.snoozeloo.presentation.util.RINGTONE_URI
 import com.ykim.snoozeloo.presentation.util.ALARM_TIME
+import com.ykim.snoozeloo.presentation.util.getDefaultRingtone
+import com.ykim.snoozeloo.presentation.util.getUri
 import com.ykim.snoozeloo.presentation.util.turnScreenOffAndKeyguardOn
 import com.ykim.snoozeloo.presentation.util.turnScreenOnAndKeyguardOff
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
@@ -21,12 +24,14 @@ class TriggerActivity : ComponentActivity() {
         val alarmId = intent.getIntExtra(ALARM_ID, 0)
         val alarmTime = intent.getStringExtra(ALARM_TIME) ?: ""
         val alarmName = intent.getStringExtra(ALARM_NAME) ?: ""
+        val ringtoneUri = intent.getStringExtra(RINGTONE_URI) ?: getDefaultRingtone(this).getUri()
         setContent {
             SnoozelooTheme {
                 TriggerScreenRoot(
                     alarmId = alarmId,
                     alarmTime = alarmTime,
-                    alarmName = alarmName
+                    alarmName = alarmName,
+                    ringtoneUri = ringtoneUri
                 )
             }
         }

@@ -19,6 +19,7 @@ const val CHANNEL_ID = "SnoozelooChannelId"
 const val ALARM_ID = "alarmId"
 const val ALARM_NAME = "alarmName"
 const val ALARM_TIME = "alarmTime"
+const val RINGTONE_URI = "ringtoneUri"
 
 fun Context.registerAlarm(alarm: Alarm) {
     val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -29,6 +30,7 @@ fun Context.registerAlarm(alarm: Alarm) {
         putExtra(ALARM_ID, alarm.id)
         putExtra(ALARM_NAME, alarm.name)
         putExtra(ALARM_TIME, alarm.time)
+        putExtra(RINGTONE_URI, alarm.ringtone.getUri())
     }
     val pendingIntent = PendingIntent.getBroadcast(
         this,

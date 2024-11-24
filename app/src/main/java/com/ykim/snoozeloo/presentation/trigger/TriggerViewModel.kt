@@ -2,8 +2,9 @@ package com.ykim.snoozeloo.presentation.trigger
 
 import android.content.Context
 import android.media.AudioAttributes
+import android.media.Ringtone
 import android.media.RingtoneManager
-import android.provider.MediaStore.Audio
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -28,16 +29,7 @@ class TriggerViewModel @Inject constructor(
     private val eventChannel = Channel<TriggerEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    private val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-    private val ringtone = RingtoneManager.getRingtone(context, alarmUri)
-
-    init {
-        ringtone.audioAttributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_ALARM)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-            .build()
-        ringtone.play()
-    }
+    var ringtone: Ringtone? = null
 
     fun setInitialData(id: Int, time: String, name: String) {
         state = state.copy(
@@ -47,13 +39,22 @@ class TriggerViewModel @Inject constructor(
         )
     }
 
+    fun ringAlarm(uri: String) {
+        val ringtone = RingtoneManager.getRingtone(context, Uri.parse(uri))
+        ringtone.audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ALARM)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+        ringtone.play()
+    }
+
     fun onAction(action: TriggerAction) {
         viewModelScope.launch {
             when (action) {
                 is TriggerAction.OnTurnOff -> {
                     eventChannel.send(TriggerEvent.TurnOffAlarm)
                     context.cancelAlarm(state.id ?: 0)
-                    ringtone.stop()
+                    ringtone?.stop()
                 }
             }
         }
