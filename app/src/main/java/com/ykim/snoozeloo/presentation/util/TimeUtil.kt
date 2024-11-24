@@ -3,14 +3,12 @@ package com.ykim.snoozeloo.presentation.util
 import android.content.Context
 import android.os.Build
 import com.ykim.snoozeloo.R
-import com.ykim.snoozeloo.domain.DaysOfWeek
 import java.text.SimpleDateFormat
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import kotlin.time.Duration.Companion.milliseconds
 
 private const val FORMAT_12_HOUR = "hh:mm a"
 private const val FORMAT_24_HOUR = "HH:mm"
@@ -95,7 +93,7 @@ fun Int.timeLeft(context: Context, enabledDays: Int): String {
         set(Calendar.SECOND, 0)
         set(Calendar.MILLISECOND, 0)
     }
-    val closestDate = getClosestDate(now, this / 60, this % 60, enabledDays)
+    val closestDate = getClosestDate(this / 60, this % 60, enabledDays)
     val diffMillis = closestDate.timeInMillis - now.timeInMillis
     val day = TimeUnit.MILLISECONDS.toDays(diffMillis)
     val hour = TimeUnit.MILLISECONDS.toHours(diffMillis) % 24
@@ -142,11 +140,14 @@ private fun getCurrentTimeInMinutes(): Int {
 }
 
 fun getClosestDate(
-    now: Calendar,
     hour: Int,
     minute: Int,
     enabledDays: Int
 ): Calendar {
+    val now = Calendar.getInstance().apply {
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
     val targetDays = enabledDays.getEnabledDays()
     val closestDate = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, hour)
@@ -175,4 +176,15 @@ fun getClosestDate(
         }
     }
     return closestDate
+}
+
+fun getSnoozedTime(
+    hour: Int,
+    minute: Int,
+): Calendar {
+    return Calendar.getInstance().apply {
+        add(Calendar.MINUTE, 5)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
 }

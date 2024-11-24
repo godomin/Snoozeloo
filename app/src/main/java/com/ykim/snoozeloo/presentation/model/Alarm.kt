@@ -2,7 +2,7 @@ package com.ykim.snoozeloo.presentation.model
 
 data class Alarm(
     val name: String? = null,
-    val time: String,
+    val time: String, // 12hour format
     val period: String,
     val timeLeft: String,
     val bedTimeLeft: String,

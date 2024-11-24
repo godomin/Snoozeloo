@@ -1,6 +1,7 @@
 package com.ykim.snoozeloo.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
 @Composable
-fun SnoozelooButton(
+fun SnoozelooOutlinedButton(
     text: String,
     enabled: Boolean = true,
     onClick: () -> Unit,
@@ -28,7 +29,8 @@ fun SnoozelooButton(
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(30.dp))
-            .background(if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceDim)
+            .background(if (enabled) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceDim)
+            .border(width = 1.dp, color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(30.dp))
             .clickable(
                 enabled = enabled,
                 onClick = onClick
@@ -39,15 +41,15 @@ fun SnoozelooButton(
     ) {
         Text(
             text = text,
-            style = fontStyle.copy(color = MaterialTheme.colorScheme.onPrimary)
+            style = fontStyle.copy(color = MaterialTheme.colorScheme.primary)
         )
     }
 }
 
 @Preview
 @Composable
-private fun SnoozelooButtonPreview() {
+private fun SnoozelooOutlinedButtonPreview() {
     SnoozelooTheme {
-        SnoozelooButton("Save", true, {})
+        SnoozelooOutlinedButton("Save", true, {})
     }
 }

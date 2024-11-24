@@ -52,7 +52,7 @@ fun ListCard(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center,
             ) {
-                if (data.name != null) {
+                if (data.name?.isNotEmpty() == true) {
                     Text(
                         text = data.name,
                         style = MaterialTheme.typography.headlineSmall

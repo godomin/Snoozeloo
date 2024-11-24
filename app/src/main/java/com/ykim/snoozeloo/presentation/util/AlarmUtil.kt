@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.ykim.snoozeloo.AlarmReceiver
 import com.ykim.snoozeloo.R
 import com.ykim.snoozeloo.presentation.TriggerActivity
@@ -22,26 +23,41 @@ const val ALARM_TIME = "alarmTime"
 const val RINGTONE_URI = "ringtoneUri"
 
 fun Context.registerAlarm(alarm: Alarm) {
-    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val (hour, minute) = alarm.time.to24HourFormat(alarm.period)
-    val closestTime = getClosestDate(Calendar.getInstance(), hour.toInt(), minute.toInt(), alarm.enabledDays)
+    val closestTime = getClosestDate(hour.toInt(), minute.toInt(), alarm.enabledDays)
+    register(this, alarm.id, alarm.time, alarm.name, alarm.ringtone.getUri(), closestTime)
+}
 
-    val intent = Intent(this, AlarmReceiver::class.java).apply {
-        putExtra(ALARM_ID, alarm.id)
-        putExtra(ALARM_NAME, alarm.name)
-        putExtra(ALARM_TIME, alarm.time)
-        putExtra(RINGTONE_URI, alarm.ringtone.getUri())
+fun Context.snoozeAlarm(id: Int?, time: String, name: String?, ringtoneUri: String?) {
+    val (hour, minute) = time.split(":").map { it.toInt() }
+    val snoozedTime = getSnoozedTime(hour, minute)
+    register(this, id, time, name, ringtoneUri, snoozedTime)
+}
+
+private fun register(
+    context: Context,
+    id: Int?,
+    time: String,
+    name: String?,
+    ringtoneUri: String?,
+    target: Calendar
+) {
+    val intent = Intent(context, AlarmReceiver::class.java).apply {
+        putExtra(ALARM_ID, id)
+        putExtra(ALARM_NAME, name)
+        putExtra(ALARM_TIME, time)
+        putExtra(RINGTONE_URI, ringtoneUri)
     }
     val pendingIntent = PendingIntent.getBroadcast(
-        this,
-        alarm.id ?: 0,
+        context,
+        id ?: 0,
         intent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
-
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     alarmManager.setExactAndAllowWhileIdle(
         AlarmManager.RTC_WAKEUP,
-        closestTime.timeInMillis,
+        target.timeInMillis,
         pendingIntent
     )
 }
