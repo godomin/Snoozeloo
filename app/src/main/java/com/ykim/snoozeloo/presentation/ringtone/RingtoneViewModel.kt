@@ -7,11 +7,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.ykim.snoozeloo.RingtoneScreen
 import com.ykim.snoozeloo.presentation.model.Ringtone
+import com.ykim.snoozeloo.presentation.util.getUri
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,17 +29,29 @@ class RingtoneViewModel @Inject constructor(
         private set
 
     init {
-        val ringtone = savedStateHandle.toRoute<RingtoneScreen>().ringtoneUri
-        state = state.copy(selectedUri = ringtone)
-        getRingtones(context)
+        viewModelScope.launch {
+            val ringtone = savedStateHandle.toRoute<RingtoneScreen>().ringtoneUri
+            val ringtoneList = withContext(Dispatchers.IO) {
+                getRingtones(context)
+            }
+            state = state.copy(
+                ringtoneList = ringtoneList,
+                selectedUri = ringtone,
+            )
+        }
     }
 
     fun onAction(action: RingtoneAction) {
-
+        when (action) {
+            is RingtoneAction.OnItemClick -> {
+                state = state.copy(selectedUri = action.ringtone.getUri())
+            }
+            else -> Unit
+        }
     }
 
-    private fun getRingtones(context: Context) {
-        val list = mutableListOf<Ringtone>()
+    private fun getRingtones(context: Context): List<Ringtone> {
+        val list = mutableListOf<Ringtone>(Ringtone.Silent)
         val ringtoneManager = RingtoneManager(context).apply {
             setType(RingtoneManager.TYPE_RINGTONE)
         }
@@ -45,6 +62,6 @@ class RingtoneViewModel @Inject constructor(
             list.add(Ringtone.Normal(title, uri.toString()))
         }
         cursor.close()
-        state = state.copy(ringtoneList = list)
+        return list
     }
 }

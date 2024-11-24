@@ -9,12 +9,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.ykim.snoozeloo.DetailScreen
-import com.ykim.snoozeloo.R
 import com.ykim.snoozeloo.domain.AlarmRepository
 import com.ykim.snoozeloo.domain.model.AlarmData
 import com.ykim.snoozeloo.presentation.model.Ringtone
 import com.ykim.snoozeloo.presentation.util.getDefaultRingtone
 import com.ykim.snoozeloo.presentation.util.getRingtoneTitle
+import com.ykim.snoozeloo.presentation.util.getTitle
+import com.ykim.snoozeloo.presentation.util.getUri
 import com.ykim.snoozeloo.presentation.util.registerAlarm
 import com.ykim.snoozeloo.presentation.util.timeLeft
 import com.ykim.snoozeloo.presentation.util.to24HourFormat
@@ -51,10 +52,16 @@ class DetailViewModel @Inject constructor(
                     minute = minute,
                     enabled = alarm?.enabled ?: true,
                     enabledDays = alarm?.enabledDays ?: 0,
-                    ringtoneUri = getRingtoneUri(ringtone),
-                    ringtoneTitle = getRingtoneTitle(ringtone)
+                    ringtoneUri = ringtone.getUri(),
+                    ringtoneTitle = ringtone.getTitle(context)
                 )
                 checkValidTime(hour, minute)
+            } ?: run {
+                val ringtone = getDefaultRingtone(context)
+                state = state.copy(
+                    ringtoneUri = ringtone.getUri(),
+                    ringtoneTitle = ringtone.getTitle(context)
+                )
             }
         }
     }
@@ -109,20 +116,6 @@ class DetailViewModel @Inject constructor(
             alarmRepository.updateAlarm(newAlarm)
         }
         context.registerAlarm(newAlarm.toAlarm(context))
-    }
-
-    private fun getRingtoneTitle(ringtone: Ringtone): String {
-        return when (ringtone) {
-            is Ringtone.Normal -> ringtone.title
-            Ringtone.Silent -> context.getString(R.string.silent)
-        }
-    }
-
-    private fun getRingtoneUri(ringtone: Ringtone): String {
-        return when (ringtone) {
-            is Ringtone.Normal -> ringtone.uri
-            Ringtone.Silent -> ""
-        }
     }
 
     private fun getRingtone(): Ringtone {

@@ -1,5 +1,8 @@
 package com.ykim.snoozeloo.presentation.ringtone
 
-sealed interface RingtoneAction {
+import com.ykim.snoozeloo.presentation.model.Ringtone
 
+sealed interface RingtoneAction {
+    data object OnBackPress : RingtoneAction
+    data class OnItemClick(val ringtone: Ringtone) : RingtoneAction
 }
