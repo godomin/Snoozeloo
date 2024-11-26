@@ -1,7 +1,6 @@
 package com.ykim.snoozeloo.presentation.list
 
 import android.content.Context
-import android.os.Build
 import android.provider.Settings
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,11 +8,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ykim.snoozeloo.domain.AlarmRepository
+import com.ykim.snoozeloo.domain.DaysOfWeek
 import com.ykim.snoozeloo.presentation.model.Alarm
-import com.ykim.snoozeloo.presentation.toAlarm
-import com.ykim.snoozeloo.presentation.toAlarmData
+import com.ykim.snoozeloo.presentation.util.toAlarm
+import com.ykim.snoozeloo.presentation.util.toAlarmData
 import com.ykim.snoozeloo.presentation.util.cancelAlarm
 import com.ykim.snoozeloo.presentation.util.registerAlarm
+import com.ykim.snoozeloo.presentation.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.launchIn
@@ -73,9 +74,10 @@ class ListViewModel @Inject constructor(
             alarmRepository.updateAlarm(toggledAlarm.toAlarmData())
         }
         if (toggledAlarm.enabled) {
+            alarm.id?.let { context.cancelAlarm(it) }
             context.registerAlarm(toggledAlarm)
         } else {
-            context.cancelAlarm(alarm.id ?: 0)
+            alarm.id?.let { context.cancelAlarm(it) }
         }
     }
 

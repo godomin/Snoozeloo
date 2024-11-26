@@ -46,6 +46,7 @@ import com.ykim.snoozeloo.presentation.components.ListCard
 import com.ykim.snoozeloo.presentation.components.SnoozelooButton
 import com.ykim.snoozeloo.presentation.components.SnoozelooFloatingActionButton
 import com.ykim.snoozeloo.presentation.model.Alarm
+import com.ykim.snoozeloo.presentation.model.Ringtone
 import com.ykim.snoozeloo.presentation.util.hasNotificationPermission
 import com.ykim.snoozeloo.presentation.util.shouldShowNotificationRationale
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
@@ -247,6 +248,11 @@ private fun ListScreenPreview() {
                         "10:00",
                         "AM",
                         "Alarm in 30min",
+                        "Go to bed at 02:20AM to get 8h of sleep",
+                        true,
+                        0b1100101,
+                        Ringtone.Silent,
+                        60,
                         true
                     ),
                     Alarm(
@@ -254,6 +260,11 @@ private fun ListScreenPreview() {
                         "04:00",
                         "PM",
                         "Alarm in 5h 30min",
+                        "",
+                        false,
+                        0b1100101,
+                        Ringtone.Normal("Silent", ""),
+                        32,
                         false
                     )
                 )

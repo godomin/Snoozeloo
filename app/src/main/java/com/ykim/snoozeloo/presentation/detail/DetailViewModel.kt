@@ -8,14 +8,22 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.ykim.snoozeloo.Detail
+import com.ykim.snoozeloo.DetailScreen
 import com.ykim.snoozeloo.domain.AlarmRepository
 import com.ykim.snoozeloo.domain.model.AlarmData
-import com.ykim.snoozeloo.presentation.timeLeft
-import com.ykim.snoozeloo.presentation.to24HourFormat
-import com.ykim.snoozeloo.presentation.toAlarm
-import com.ykim.snoozeloo.presentation.toMinutes
+import com.ykim.snoozeloo.presentation.model.Ringtone
+import com.ykim.snoozeloo.presentation.util.cancelAlarm
+import com.ykim.snoozeloo.presentation.util.getDefaultRingtone
+import com.ykim.snoozeloo.presentation.util.getRingtoneTitle
+import com.ykim.snoozeloo.presentation.util.getTitle
+import com.ykim.snoozeloo.presentation.util.getUri
 import com.ykim.snoozeloo.presentation.util.registerAlarm
+import com.ykim.snoozeloo.presentation.util.timeLeft
+import com.ykim.snoozeloo.presentation.util.to24HourFormat
+import com.ykim.snoozeloo.presentation.util.toAlarm
+import com.ykim.snoozeloo.presentation.util.toMinutes
+import com.ykim.snoozeloo.presentation.util.toRingtoneData
+import com.ykim.snoozeloo.presentation.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -33,18 +41,30 @@ class DetailViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val detail = savedStateHandle.toRoute<Detail>()
-            detail.id?.let { id ->
-                val alarm = alarmRepository.getAlarm(id)
-                val (hour, minute) = alarm?.time?.to24HourFormat() ?: ("00" to "00")
+            val detailScreen = savedStateHandle.toRoute<DetailScreen>()
+            detailScreen.id?.let { id ->
+                val alarm = alarmRepository.getAlarm(id)?.toAlarm(context)
+                val (hour, minute) = alarm?.time?.to24HourFormat(alarm.period) ?: ("00" to "00")
+                val ringtone = alarm?.ringtone ?: getDefaultRingtone(context)
                 state = state.copy(
                     id = id,
                     name = alarm?.name ?: "",
                     hour = hour,
                     minute = minute,
-                    enabled = alarm?.enabled ?: true
+                    enabled = alarm?.enabled ?: true,
+                    enabledDays = alarm?.enabledDays ?: 0,
+                    ringtoneUri = ringtone.getUri(),
+                    ringtoneTitle = ringtone.getTitle(context),
+                    volume = alarm?.volume ?: 50,
+                    isVibrate = alarm?.isVibrate ?: false
                 )
                 checkValidTime(hour, minute)
+            } ?: run {
+                val ringtone = getDefaultRingtone(context)
+                state = state.copy(
+                    ringtoneUri = ringtone.getUri(),
+                    ringtoneTitle = ringtone.getTitle(context)
+                )
             }
         }
     }
@@ -57,17 +77,38 @@ class DetailViewModel @Inject constructor(
                 checkValidTime(action.hour, state.minute)
                 state = state.copy(hour = action.hour)
             }
+
             is DetailAction.OnMinuteChange -> {
                 checkValidTime(state.hour, action.minute)
                 state = state.copy(minute = action.minute)
             }
+
+            is DetailAction.OnDayChange -> {
+                state = state.copy(enabledDays = state.enabledDays.toggle(action.day))
+            }
+
+            is DetailAction.OnRingtoneChange -> {
+                state = state.copy(
+                    ringtoneUri = action.ringtoneUri,
+                    ringtoneTitle = action.ringtoneUri.getRingtoneTitle(context)
+                )
+            }
+
+            is DetailAction.OnVolumeChange -> {
+                state = state.copy(volume = action.volume)
+            }
+
+            is DetailAction.OnVibrateChange -> {
+                state = state.copy(isVibrate = !state.isVibrate)
+            }
+
             else -> Unit
         }
     }
 
     private fun checkValidTime(hour: String, minute: String) {
         val valid = kotlin.runCatching {
-            val timeLeft = "${hour}:${minute}".toMinutes().timeLeft(context)
+            val timeLeft = "${hour}:${minute}".toMinutes().timeLeft(context, state.enabledDays)
             state = state.copy(timeLeft = timeLeft)
         }.isSuccess
         state = state.copy(isValidTime = valid)
@@ -78,11 +119,25 @@ class DetailViewModel @Inject constructor(
             id = state.id,
             name = state.name,
             time = "${state.hour}:${state.minute}".toMinutes(),
-            enabled = state.enabled
+            enabled = state.enabled,
+            enabledDays = state.enabledDays,
+            ringtone = getRingtone().toRingtoneData(),
+            volume = state.volume,
+            isVibrate = state.isVibrate
         )
         viewModelScope.launch {
             alarmRepository.updateAlarm(newAlarm)
         }
-        context.registerAlarm(newAlarm.toAlarm(context))
+        if (newAlarm.enabled) {
+            newAlarm.id?.let { context.cancelAlarm(it) }
+            context.registerAlarm(newAlarm.toAlarm(context))
+        }
+    }
+
+    private fun getRingtone(): Ringtone {
+        return when (state.ringtoneUri) {
+            "" -> Ringtone.Silent
+            else -> Ringtone.Normal(state.ringtoneTitle, state.ringtoneUri)
+        }
     }
 }

@@ -10,7 +10,7 @@ interface AlarmRepository {
 
     suspend fun deleteAlarm(alarmData: AlarmData)
 
-    suspend fun getAlarm(id: Int): AlarmEntity?
+    suspend fun getAlarm(id: Int): AlarmData?
 
     fun getAlarms(): Flow<List<AlarmData>>
 }

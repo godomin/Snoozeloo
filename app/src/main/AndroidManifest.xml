@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name=".SnoozelooApp"
@@ -35,7 +36,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.TriggerActivity"
+            android:name=".presentation.trigger.TriggerActivity"
             android:excludeFromRecents="true"
             android:exported="true"
             android:launchMode="singleTask"
@@ -43,11 +44,10 @@
             android:showOnLockScreen="true"
             android:turnScreenOn="true" />
 
-        <receiver android:name=".AlarmReceiver" />
+        <receiver android:name=".presentation.AlarmReceiver" />
         <receiver
-            android:name=".BootReceiver"
-            android:enabled="false"
-            android:exported="true">
+            android:name=".presentation.BootReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

@@ -4,16 +4,12 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchColors
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
@@ -30,18 +27,21 @@ import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 fun SnoozelooSwitch(
     checked: Boolean,
     onToggle: () -> Unit,
+    width: Dp = 51.dp,
+    height: Dp = 30.dp,
+    switchSize: Dp = 26.dp,
     modifier: Modifier = Modifier
 ) {
     val thumbPosition by animateDpAsState(
-        targetValue = if (checked) 21.dp else 0.dp,
+        targetValue = if (checked) width - switchSize - 4.dp else 0.dp,
         label = "ThumbPositionAnimation"
     )
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(24.dp))
             .background(if (checked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer)
-            .size(width = 51.dp, height = 30.dp)
+            .size(width = width, height = height)
             .clickable(onClick = onToggle)
             .padding(2.dp),
         contentAlignment = Alignment.CenterStart
@@ -51,8 +51,8 @@ fun SnoozelooSwitch(
                 .offset(x = thumbPosition)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.onPrimary)
-                .size(26.dp),
-            )
+                .size(switchSize),
+        )
     }
 }
 

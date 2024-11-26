@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ykim.snoozeloo.R
 import com.ykim.snoozeloo.presentation.components.SnoozelooButton
+import com.ykim.snoozeloo.presentation.components.SnoozelooOutlinedButton
 import com.ykim.snoozeloo.presentation.util.ObserveAsEvents
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 import java.util.Locale
@@ -36,18 +37,22 @@ fun TriggerScreenRoot(
     alarmId: Int,
     alarmTime: String,
     alarmName: String,
+    ringtoneUri: String,
+    volume: Int,
+    vibrate: Boolean,
     viewModel: TriggerViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
-            is TriggerEvent.TurnOffAlarm -> {
+            is TriggerEvent.FinishScreen -> {
                 (context as? Activity)?.finishAffinity()
             }
         }
     }
-    LaunchedEffect(alarmId, alarmTime, alarmName) {
-        viewModel.setInitialData(alarmId, alarmTime, alarmName)
+    LaunchedEffect(alarmId, alarmTime, alarmName, volume, vibrate) {
+        viewModel.setInitialData(alarmId, alarmTime, alarmName, volume, vibrate)
+        viewModel.ringAlarm(ringtoneUri)
     }
     TriggerScreen(
         state = viewModel.state,
@@ -93,11 +98,18 @@ private fun TriggerScreen(
         Spacer(modifier = Modifier.height(24.dp))
         SnoozelooButton(
             text = stringResource(id = R.string.turn_off),
-            enabled = true,
             onClick = { onAction(TriggerAction.OnTurnOff) },
             fontStyle = MaterialTheme.typography.headlineMedium
                 .copy(fontWeight = FontWeight.SemiBold),
-            modifier = Modifier.width(214.dp)
+            modifier = Modifier.width(271.dp)
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        SnoozelooOutlinedButton(
+            text = stringResource(id = R.string.snooze_for_5_minutes),
+            onClick = { onAction(TriggerAction.OnSnooze) },
+            fontStyle = MaterialTheme.typography.headlineMedium
+                .copy(fontWeight = FontWeight.SemiBold),
+            modifier = Modifier.width(271.dp)
         )
     }
 }

@@ -9,45 +9,76 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import com.ykim.snoozeloo.AlarmReceiver
+import com.ykim.snoozeloo.presentation.AlarmReceiver
 import com.ykim.snoozeloo.R
-import com.ykim.snoozeloo.presentation.TriggerActivity
+import com.ykim.snoozeloo.presentation.trigger.TriggerActivity
 import com.ykim.snoozeloo.presentation.model.Alarm
-import com.ykim.snoozeloo.presentation.to24HourFormat
 import java.util.Calendar
 
 const val CHANNEL_ID = "SnoozelooChannelId"
 const val ALARM_ID = "alarmId"
 const val ALARM_NAME = "alarmName"
 const val ALARM_TIME = "alarmTime"
+const val RINGTONE_URI = "ringtoneUri"
+const val VOLUME = "volume"
+const val VIBRATE = "vibrate"
 
 fun Context.registerAlarm(alarm: Alarm) {
-    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val (hour, minute) = alarm.time.to24HourFormat(alarm.period)
-    val calendar = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, hour.toInt())
-        set(Calendar.MINUTE, minute.toInt())
-        set(Calendar.SECOND, 0)
-        if (before(Calendar.getInstance())) {
-            add(Calendar.DATE, 1)
-        }
-    }
+    val closestTime = getClosestDate(hour.toInt(), minute.toInt(), alarm.enabledDays)
+    register(
+        this,
+        alarm.id,
+        alarm.time,
+        alarm.name,
+        alarm.ringtone.getUri(),
+        alarm.volume,
+        alarm.isVibrate,
+        closestTime
+    )
+}
 
-    val intent = Intent(this, AlarmReceiver::class.java).apply {
-        putExtra(ALARM_ID, alarm.id)
-        putExtra(ALARM_NAME, alarm.name)
-        putExtra(ALARM_TIME, alarm.time)
+fun Context.snoozeAlarm(
+    id: Int?,
+    time: String,
+    name: String?,
+    ringtoneUri: String?,
+    volume: Int?,
+    vibrate: Boolean?
+) {
+    val (hour, minute) = time.split(":").map { it.toInt() }
+    val snoozedTime = getSnoozedTime(hour, minute)
+    register(this, id, time, name, ringtoneUri, volume, vibrate, snoozedTime)
+}
+
+private fun register(
+    context: Context,
+    id: Int?,
+    time: String,
+    name: String?,
+    ringtoneUri: String?,
+    volume: Int?,
+    vibrate: Boolean?,
+    target: Calendar
+) {
+    val intent = Intent(context, AlarmReceiver::class.java).apply {
+        putExtra(ALARM_ID, id)
+        putExtra(ALARM_NAME, name)
+        putExtra(ALARM_TIME, time)
+        putExtra(RINGTONE_URI, ringtoneUri)
+        putExtra(VOLUME, volume)
+        putExtra(VIBRATE, vibrate)
     }
     val pendingIntent = PendingIntent.getBroadcast(
-        this,
-        alarm.id ?: 0,
+        context,
+        id ?: 0,
         intent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
-
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     alarmManager.setExactAndAllowWhileIdle(
         AlarmManager.RTC_WAKEUP,
-        calendar.timeInMillis,
+        target.timeInMillis,
         pendingIntent
     )
 }

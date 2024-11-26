@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -43,22 +45,38 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.ykim.snoozeloo.R
+import com.ykim.snoozeloo.domain.DaysOfWeek
 import com.ykim.snoozeloo.presentation.components.SnoozelooButton
+import com.ykim.snoozeloo.presentation.components.SnoozelooChip
 import com.ykim.snoozeloo.presentation.components.SnoozelooDialog
+import com.ykim.snoozeloo.presentation.components.SnoozelooSlider
+import com.ykim.snoozeloo.presentation.components.SnoozelooSwitch
+import com.ykim.snoozeloo.presentation.util.KEY_RINGTONE_URI
 import com.ykim.snoozeloo.presentation.util.addFocusCleaner
+import com.ykim.snoozeloo.presentation.util.getNameResourceId
+import com.ykim.snoozeloo.presentation.util.selected
 import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
 @Composable
 fun DetailScreenRoot(
+    navController: NavController,
     onCloseScreen: () -> Unit,
+    onRingtoneClick: (String) -> Unit,
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
+    val newRingtoneUri =
+        navController.currentBackStackEntry?.savedStateHandle?.get<String>(KEY_RINGTONE_URI)
+    if (newRingtoneUri != null) {
+        viewModel.onAction(DetailAction.OnRingtoneChange(newRingtoneUri))
+    }
     DetailScreen(
         state = viewModel.state,
         onAction = { action ->
             when (action) {
                 DetailAction.OnClose, DetailAction.OnSave -> onCloseScreen()
+                is DetailAction.OnRingtoneClick -> onRingtoneClick(viewModel.state.ringtoneUri)
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -66,13 +84,15 @@ fun DetailScreenRoot(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetailScreen(
     state: DetailState,
     onAction: (DetailAction) -> Unit
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    var showNameDialog by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -85,9 +105,9 @@ private fun DetailScreen(
                 .padding(16.dp)
                 .padding(padding)
         ) {
-            if (showDialog) {
+            if (showNameDialog) {
                 SnoozelooDialog(
-                    onDismiss = { showDialog = false },
+                    onDismiss = { showNameDialog = false },
                     onSave = { onAction(DetailAction.OnNameChange(it)) },
                     initialText = state.name
                 )
@@ -116,7 +136,8 @@ private fun DetailScreen(
             WhiteCard(
                 innerPadding = 24.dp,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -160,8 +181,8 @@ private fun DetailScreen(
                     .fillMaxWidth()
                     .clickable {
                         focusManager.clearFocus()
-                        showDialog = true
-                    },
+                        showNameDialog = true
+                    }
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -178,7 +199,93 @@ private fun DetailScreen(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            WhiteCard(
+                innerPadding = 16.dp,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.repeat),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                ) {
+                    DaysOfWeek.entries.forEach { day ->
+                        SnoozelooChip(
+                            text = stringResource(id = day.getNameResourceId()),
+                            selected = state.enabledDays.selected(day),
+                            onClick = { onAction(DetailAction.OnDayChange(day)) }
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            WhiteCard(
+                innerPadding = 16.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onAction(DetailAction.OnRingtoneClick(state.ringtoneUri)) },
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.alarm_ringtone),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        text = state.ringtoneTitle,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            WhiteCard(
+                innerPadding = 12.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(id = R.string.alarm_volume),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 4.dp)
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                SnoozelooSlider(
+                    value = state.volume,
+                    onValueChange = { onAction(DetailAction.OnVolumeChange(it)) }
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            WhiteCard(
+                innerPadding = 16.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.vibrate),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    SnoozelooSwitch(
+                        width = 41.dp,
+                        height = 24.dp,
+                        switchSize = 20.dp,
+                        checked = state.isVibrate,
+                        onToggle = { onAction(DetailAction.OnVibrateChange) }
+                    )
+                }
+            }
         }
     }
 }
@@ -187,6 +294,7 @@ private fun DetailScreen(
 fun WhiteCard(
     innerPadding: Dp = 0.dp,
     modifier: Modifier = Modifier,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     composable: @Composable () -> Unit
 ) {
     Column(
@@ -194,7 +302,7 @@ fun WhiteCard(
             .clip(RoundedCornerShape(10.dp))
             .background(MaterialTheme.colorScheme.onPrimary)
             .padding(innerPadding),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = horizontalAlignment
     ) {
         composable()
     }
@@ -277,7 +385,12 @@ private fun DetailScreenPreview() {
                 hour = "10",
                 minute = "00",
                 name = "Work",
-                isValidTime = true
+                isValidTime = true,
+                enabledDays = 0b0110101,
+                timeLeft = "Alarm in 3h 35m",
+                ringtoneTitle = "Default",
+                volume = 50,
+                isVibrate = true,
             ),
             onAction = {}
         )
