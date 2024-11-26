@@ -54,7 +54,9 @@ class DetailViewModel @Inject constructor(
                     enabled = alarm?.enabled ?: true,
                     enabledDays = alarm?.enabledDays ?: 0,
                     ringtoneUri = ringtone.getUri(),
-                    ringtoneTitle = ringtone.getTitle(context)
+                    ringtoneTitle = ringtone.getTitle(context),
+                    volume = alarm?.volume ?: 50,
+                    isVibrate = alarm?.isVibrate ?: false
                 )
                 checkValidTime(hour, minute)
             } ?: run {

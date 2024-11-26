@@ -15,8 +15,8 @@ fun AlarmEntity.toAlarmData(): AlarmData {
         enabled = enabled,
         enabledDays = enabledDays,
         ringtone = ringtoneJson.toRingtoneSerializable().toRingtoneData(),
-        volume = 0,
-        isVibrate = false,
+        volume = volume,
+        isVibrate = isVibrate,
     )
 }
 

@@ -27,11 +27,13 @@ import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 fun SnoozelooSwitch(
     checked: Boolean,
     onToggle: () -> Unit,
-    buttonSize: Dp = 26.dp,
+    width: Dp = 51.dp,
+    height: Dp = 30.dp,
+    switchSize: Dp = 26.dp,
     modifier: Modifier = Modifier
 ) {
     val thumbPosition by animateDpAsState(
-        targetValue = if (checked) 21.dp else 0.dp,
+        targetValue = if (checked) width - switchSize - 4.dp else 0.dp,
         label = "ThumbPositionAnimation"
     )
 
@@ -39,7 +41,7 @@ fun SnoozelooSwitch(
         modifier = modifier
             .clip(RoundedCornerShape(24.dp))
             .background(if (checked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer)
-            .size(width = 51.dp, height = 30.dp)
+            .size(width = width, height = height)
             .clickable(onClick = onToggle)
             .padding(2.dp),
         contentAlignment = Alignment.CenterStart
@@ -49,7 +51,7 @@ fun SnoozelooSwitch(
                 .offset(x = thumbPosition)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.onPrimary)
-                .size(buttonSize),
+                .size(switchSize),
         )
     }
 }

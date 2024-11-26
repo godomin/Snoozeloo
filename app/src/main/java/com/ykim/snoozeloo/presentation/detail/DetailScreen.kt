@@ -21,11 +21,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -281,8 +278,9 @@ private fun DetailScreen(
                         style = MaterialTheme.typography.titleLarge
                     )
                     SnoozelooSwitch(
-                        modifier = Modifier.size(width = 41.dp, height = 24.dp),
-                        buttonSize = 20.dp,
+                        width = 41.dp,
+                        height = 24.dp,
+                        switchSize = 20.dp,
                         checked = state.isVibrate,
                         onToggle = { onAction(DetailAction.OnVibrateChange) }
                     )
@@ -392,6 +390,7 @@ private fun DetailScreenPreview() {
                 timeLeft = "Alarm in 3h 35m",
                 ringtoneTitle = "Default",
                 volume = 50,
+                isVibrate = true,
             ),
             onAction = {}
         )

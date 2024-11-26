@@ -9,6 +9,8 @@ import com.ykim.snoozeloo.presentation.util.ALARM_ID
 import com.ykim.snoozeloo.presentation.util.ALARM_NAME
 import com.ykim.snoozeloo.presentation.util.RINGTONE_URI
 import com.ykim.snoozeloo.presentation.util.ALARM_TIME
+import com.ykim.snoozeloo.presentation.util.VIBRATE
+import com.ykim.snoozeloo.presentation.util.VOLUME
 import com.ykim.snoozeloo.presentation.util.getDefaultRingtone
 import com.ykim.snoozeloo.presentation.util.getUri
 import com.ykim.snoozeloo.presentation.util.turnScreenOffAndKeyguardOn
@@ -25,13 +27,17 @@ class TriggerActivity : ComponentActivity() {
         val alarmTime = intent.getStringExtra(ALARM_TIME) ?: ""
         val alarmName = intent.getStringExtra(ALARM_NAME) ?: ""
         val ringtoneUri = intent.getStringExtra(RINGTONE_URI) ?: getDefaultRingtone(this).getUri()
+        val volume = intent.getIntExtra(VOLUME, 50)
+        val vibrate = intent.getBooleanExtra(VIBRATE, false)
         setContent {
             SnoozelooTheme {
                 TriggerScreenRoot(
                     alarmId = alarmId,
                     alarmTime = alarmTime,
                     alarmName = alarmName,
-                    ringtoneUri = ringtoneUri
+                    ringtoneUri = ringtoneUri,
+                    volume = volume,
+                    vibrate = vibrate
                 )
             }
         }

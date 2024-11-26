@@ -21,17 +21,35 @@ const val ALARM_ID = "alarmId"
 const val ALARM_NAME = "alarmName"
 const val ALARM_TIME = "alarmTime"
 const val RINGTONE_URI = "ringtoneUri"
+const val VOLUME = "volume"
+const val VIBRATE = "vibrate"
 
 fun Context.registerAlarm(alarm: Alarm) {
     val (hour, minute) = alarm.time.to24HourFormat(alarm.period)
     val closestTime = getClosestDate(hour.toInt(), minute.toInt(), alarm.enabledDays)
-    register(this, alarm.id, alarm.time, alarm.name, alarm.ringtone.getUri(), closestTime)
+    register(
+        this,
+        alarm.id,
+        alarm.time,
+        alarm.name,
+        alarm.ringtone.getUri(),
+        alarm.volume,
+        alarm.isVibrate,
+        closestTime
+    )
 }
 
-fun Context.snoozeAlarm(id: Int?, time: String, name: String?, ringtoneUri: String?) {
+fun Context.snoozeAlarm(
+    id: Int?,
+    time: String,
+    name: String?,
+    ringtoneUri: String?,
+    volume: Int?,
+    vibrate: Boolean?
+) {
     val (hour, minute) = time.split(":").map { it.toInt() }
     val snoozedTime = getSnoozedTime(hour, minute)
-    register(this, id, time, name, ringtoneUri, snoozedTime)
+    register(this, id, time, name, ringtoneUri, volume, vibrate, snoozedTime)
 }
 
 private fun register(
@@ -40,6 +58,8 @@ private fun register(
     time: String,
     name: String?,
     ringtoneUri: String?,
+    volume: Int?,
+    vibrate: Boolean?,
     target: Calendar
 ) {
     val intent = Intent(context, AlarmReceiver::class.java).apply {
@@ -47,6 +67,8 @@ private fun register(
         putExtra(ALARM_NAME, name)
         putExtra(ALARM_TIME, time)
         putExtra(RINGTONE_URI, ringtoneUri)
+        putExtra(VOLUME, volume)
+        putExtra(VIBRATE, vibrate)
     }
     val pendingIntent = PendingIntent.getBroadcast(
         context,

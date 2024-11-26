@@ -38,6 +38,8 @@ fun TriggerScreenRoot(
     alarmTime: String,
     alarmName: String,
     ringtoneUri: String,
+    volume: Int,
+    vibrate: Boolean,
     viewModel: TriggerViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -48,8 +50,8 @@ fun TriggerScreenRoot(
             }
         }
     }
-    LaunchedEffect(alarmId, alarmTime, alarmName) {
-        viewModel.setInitialData(alarmId, alarmTime, alarmName)
+    LaunchedEffect(alarmId, alarmTime, alarmName, volume, vibrate) {
+        viewModel.setInitialData(alarmId, alarmTime, alarmName, volume, vibrate)
         viewModel.ringAlarm(ringtoneUri)
     }
     TriggerScreen(
