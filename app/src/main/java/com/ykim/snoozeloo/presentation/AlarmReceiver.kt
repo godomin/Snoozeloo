@@ -1,10 +1,9 @@
-package com.ykim.snoozeloo
+package com.ykim.snoozeloo.presentation
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.ykim.snoozeloo.presentation.TriggerActivity
-import com.ykim.snoozeloo.presentation.util.showNotificationWithFullScreenIntent
+import com.ykim.snoozeloo.presentation.trigger.TriggerActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

@@ -9,10 +9,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
-import com.ykim.snoozeloo.AlarmReceiver
+import com.ykim.snoozeloo.presentation.AlarmReceiver
 import com.ykim.snoozeloo.R
-import com.ykim.snoozeloo.presentation.TriggerActivity
+import com.ykim.snoozeloo.presentation.trigger.TriggerActivity
 import com.ykim.snoozeloo.presentation.model.Alarm
 import java.util.Calendar
 

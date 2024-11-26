@@ -1,10 +1,9 @@
-package com.ykim.snoozeloo.presentation
+package com.ykim.snoozeloo.presentation.trigger
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.ykim.snoozeloo.presentation.trigger.TriggerScreenRoot
 import com.ykim.snoozeloo.presentation.util.ALARM_ID
 import com.ykim.snoozeloo.presentation.util.ALARM_NAME
 import com.ykim.snoozeloo.presentation.util.RINGTONE_URI
