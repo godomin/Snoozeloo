@@ -17,12 +17,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -50,6 +54,8 @@ import com.ykim.snoozeloo.domain.DaysOfWeek
 import com.ykim.snoozeloo.presentation.components.SnoozelooButton
 import com.ykim.snoozeloo.presentation.components.SnoozelooChip
 import com.ykim.snoozeloo.presentation.components.SnoozelooDialog
+import com.ykim.snoozeloo.presentation.components.SnoozelooSlider
+import com.ykim.snoozeloo.presentation.components.SnoozelooSwitch
 import com.ykim.snoozeloo.presentation.util.KEY_RINGTONE_URI
 import com.ykim.snoozeloo.presentation.util.addFocusCleaner
 import com.ykim.snoozeloo.presentation.util.getNameResourceId
@@ -63,7 +69,8 @@ fun DetailScreenRoot(
     onRingtoneClick: (String) -> Unit,
     viewModel: DetailViewModel = hiltViewModel(),
 ) {
-    val newRingtoneUri = navController.currentBackStackEntry?.savedStateHandle?.get<String>(KEY_RINGTONE_URI)
+    val newRingtoneUri =
+        navController.currentBackStackEntry?.savedStateHandle?.get<String>(KEY_RINGTONE_URI)
     if (newRingtoneUri != null) {
         viewModel.onAction(DetailAction.OnRingtoneChange(newRingtoneUri))
     }
@@ -80,6 +87,7 @@ fun DetailScreenRoot(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetailScreen(
     state: DetailState,
@@ -241,6 +249,45 @@ private fun DetailScreen(
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            WhiteCard(
+                innerPadding = 12.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(id = R.string.alarm_volume),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 4.dp)
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                SnoozelooSlider(
+                    value = state.volume,
+                    onValueChange = { onAction(DetailAction.OnVolumeChange(it)) }
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            WhiteCard(
+                innerPadding = 16.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.vibrate),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    SnoozelooSwitch(
+                        modifier = Modifier.size(width = 41.dp, height = 24.dp),
+                        buttonSize = 20.dp,
+                        checked = state.isVibrate,
+                        onToggle = { onAction(DetailAction.OnVibrateChange) }
+                    )
+                }
+            }
         }
     }
 }
@@ -343,7 +390,8 @@ private fun DetailScreenPreview() {
                 isValidTime = true,
                 enabledDays = 0b0110101,
                 timeLeft = "Alarm in 3h 35m",
-                ringtoneTitle = "Default"
+                ringtoneTitle = "Default",
+                volume = 50,
             ),
             onAction = {}
         )

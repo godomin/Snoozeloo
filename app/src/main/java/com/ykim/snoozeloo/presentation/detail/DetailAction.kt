@@ -11,4 +11,6 @@ sealed interface DetailAction {
     data class OnDayChange(val day: DaysOfWeek) : DetailAction
     data class OnRingtoneClick(val ringtoneUri: String) : DetailAction
     data class OnRingtoneChange(val ringtoneUri: String) : DetailAction
+    data class OnVolumeChange(val volume: Int) : DetailAction
+    data object OnVibrateChange : DetailAction
 }

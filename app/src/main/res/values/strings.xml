@@ -26,5 +26,7 @@
     <string name="repeat">Repeat</string>
     <string name="alarm_ringtone">Alarm ringtone</string>
     <string name="silent">Silent</string>
-    <string name="snooze_for_5_minutes">Snooze for 5 min</string>"
+    <string name="snooze_for_5_minutes">Snooze for 5 min</string>
+    <string name="alarm_volume">Alarm volume</string>
+    <string name="vibrate">Vibrate</string>"
 </resources>

@@ -92,6 +92,14 @@ class DetailViewModel @Inject constructor(
                 )
             }
 
+            is DetailAction.OnVolumeChange -> {
+                state = state.copy(volume = action.volume)
+            }
+
+            is DetailAction.OnVibrateChange -> {
+                state = state.copy(isVibrate = !state.isVibrate)
+            }
+
             else -> Unit
         }
     }
@@ -112,6 +120,8 @@ class DetailViewModel @Inject constructor(
             enabled = state.enabled,
             enabledDays = state.enabledDays,
             ringtone = getRingtone().toRingtoneData(),
+            volume = state.volume,
+            isVibrate = state.isVibrate
         )
         viewModelScope.launch {
             alarmRepository.updateAlarm(newAlarm)
