@@ -53,7 +53,7 @@ import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
 @Composable
 fun ListScreenRoot(
-    onItemClick: (Int) -> Unit,
+    onItemClick: (Alarm) -> Unit,
     onAddClick: () -> Unit,
     viewModel: ListViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
 ) {
@@ -62,7 +62,7 @@ fun ListScreenRoot(
         onAction = { action ->
             when (action) {
                 is ListAction.OnAddAlarmClick -> onAddClick()
-                is ListAction.OnEditAlarmClick -> onItemClick(action.id)
+                is ListAction.OnEditAlarmClick -> onItemClick(action.alarm)
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -181,7 +181,7 @@ private fun ListScreen(
                         ListCard(
                             modifier = Modifier.clickable {
                                 alarm.id?.let { id ->
-                                    onAction(ListAction.OnEditAlarmClick(id))
+                                    onAction(ListAction.OnEditAlarmClick(alarm))
                                 }
                             },
                             data = alarm,
