@@ -28,5 +28,6 @@
     <string name="silent">Silent</string>
     <string name="snooze_for_5_minutes">Snooze for 5 min</string>
     <string name="alarm_volume">Alarm volume</string>
-    <string name="vibrate">Vibrate</string>"
+    <string name="vibrate">Vibrate</string>
+    <string name="delete">Delete</string>"
 </resources>

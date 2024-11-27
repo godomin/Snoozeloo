@@ -45,6 +45,7 @@ import com.ykim.snoozeloo.R
 import com.ykim.snoozeloo.presentation.components.ListCard
 import com.ykim.snoozeloo.presentation.components.SnoozelooButton
 import com.ykim.snoozeloo.presentation.components.SnoozelooFloatingActionButton
+import com.ykim.snoozeloo.presentation.components.SwipeableItem
 import com.ykim.snoozeloo.presentation.model.Alarm
 import com.ykim.snoozeloo.presentation.model.Ringtone
 import com.ykim.snoozeloo.presentation.util.hasNotificationPermission
@@ -171,24 +172,32 @@ private fun ListScreen(
             } else {
                 Spacer(modifier = Modifier.height(24.dp))
                 LazyColumn(
-                    modifier = Modifier,
+                    modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(
                         items = state.alarmList,
                         key = { alarm -> alarm.id ?: 0 }
                     ) { alarm ->
-                        ListCard(
-                            modifier = Modifier.clickable {
-                                alarm.id?.let { id ->
-                                    onAction(ListAction.OnEditAlarmClick(alarm))
+                        SwipeableItem(
+                            modifier = Modifier.animateItem(),
+                            isRevealed = alarm.isDeleteMode,
+                            onExpanded = { onAction(ListAction.OnItemDragged(true, alarm)) },
+                            onCollapsed = { onAction(ListAction.OnItemDragged(false, alarm)) },
+                            onActionClicked = { onAction(ListAction.OnDeleteAlarmClick(alarm)) }
+                        ) {
+                            ListCard(
+                                modifier = Modifier.clickable {
+                                    alarm.id?.let { id ->
+                                        onAction(ListAction.OnEditAlarmClick(alarm))
+                                    }
+                                },
+                                data = alarm,
+                                onToggle = {
+                                    onAction(ListAction.OnAlarmToggleClick(alarm))
                                 }
-                            },
-                            data = alarm,
-                            onToggle = {
-                                onAction(ListAction.OnAlarmToggleClick(alarm))
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }

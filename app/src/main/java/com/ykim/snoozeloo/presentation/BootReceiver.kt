@@ -19,11 +19,9 @@ class BootReceiver : BroadcastReceiver() {
     lateinit var repository: AlarmRepository
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        println("ybyb boot completed")
         doAsync {
             repository.getAlarms().onEach { alarmList ->
                 alarmList.forEach { alarmData ->
-                    println("ybyb $alarmData")
                     if (alarmData.enabled) {
                         context?.registerAlarm(alarmData.toAlarm(context))
                     }

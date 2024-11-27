@@ -14,5 +14,6 @@ data class Alarm(
     val ringtone: Ringtone,
     val volume: Int,
     val isVibrate: Boolean,
+    val isDeleteMode: Boolean = false,
     val id: Int? = null,
 )
