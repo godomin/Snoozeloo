@@ -188,14 +188,10 @@ private fun ListScreen(
                         ) {
                             ListCard(
                                 modifier = Modifier.clickable {
-                                    alarm.id?.let { id ->
-                                        onAction(ListAction.OnEditAlarmClick(alarm))
-                                    }
+                                    onAction(ListAction.OnEditAlarmClick(alarm))
                                 },
                                 data = alarm,
-                                onToggle = {
-                                    onAction(ListAction.OnAlarmToggleClick(alarm))
-                                }
+                                onToggle = { onAction(ListAction.OnAlarmToggleClick(alarm)) }
                             )
                         }
                     }

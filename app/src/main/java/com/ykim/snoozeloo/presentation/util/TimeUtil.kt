@@ -31,33 +31,10 @@ fun Int.to12HourFormat(): Pair<String, String> {
     return time to period
 }
 
-// 870 -> "14", "30"
-fun Int.to24HourFormat(): Pair<String, String> {
-    val hour = this / 60
-    val minute = this % 60
-    return hour.toTwoDigitString() to minute.toTwoDigitString()
-}
-
 // "02:30 PM" -> "14", "30"
 fun String.to24HourFormat(period: String): Pair<String, String> {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val time = LocalTime.parse(
-            "$this $period",
-            DateTimeFormatter.ofPattern(FORMAT_12_HOUR, Locale.ENGLISH)
-        )
-        val (hour, minute) = time.format(
-            DateTimeFormatter.ofPattern(
-                FORMAT_24_HOUR,
-                Locale.ENGLISH
-            )
-        ).split(":")
-        hour to minute
-    } else {
-        val date = SimpleDateFormat(FORMAT_12_HOUR, Locale.ENGLISH).parse("$this $period")
-        val (hour, minute) = SimpleDateFormat(FORMAT_24_HOUR, Locale.ENGLISH).format(date)
-            .split(":")
-        hour to minute
-    }
+    val minutes = this.toMinutes(period)
+    return (minutes / 60).toTwoDigitString() to (minutes % 60).toTwoDigitString()
 }
 
 // "02:30 PM" -> 870
@@ -183,8 +160,10 @@ fun getSnoozedTime(
     minute: Int,
 ): Calendar {
     return Calendar.getInstance().apply {
-        add(Calendar.MINUTE, 5)
+        set(Calendar.HOUR_OF_DAY, hour)
+        set(Calendar.MINUTE, minute)
         set(Calendar.SECOND, 0)
         set(Calendar.MILLISECOND, 0)
+        add(Calendar.MINUTE, 5)
     }
 }

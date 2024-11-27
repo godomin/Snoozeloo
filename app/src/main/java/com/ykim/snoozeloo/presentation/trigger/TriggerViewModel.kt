@@ -68,16 +68,15 @@ class TriggerViewModel @Inject constructor(
             } else {
                 vibrator?.vibrate(500)
             }
-        } else {
-            ringtoneUri = uri
-            ringtone = RingtoneManager.getRingtone(context, Uri.parse(uri)).apply {
-                audioAttributes = AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build()
-                volume = state.volume / 100f
-                play()
-            }
+        }
+        ringtoneUri = uri
+        ringtone = RingtoneManager.getRingtone(context, Uri.parse(uri)).apply {
+            audioAttributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+            volume = state.volume / 100f
+            play()
         }
     }
 
@@ -85,14 +84,13 @@ class TriggerViewModel @Inject constructor(
         viewModelScope.launch {
             when (action) {
                 is TriggerAction.OnTurnOff -> {
-                    eventChannel.send(TriggerEvent.FinishScreen)
                     context.cancelAlarm(state.id ?: 0)
                     ringtone?.stop()
                     vibrator?.cancel()
+                    eventChannel.send(TriggerEvent.FinishScreen)
                 }
 
                 is TriggerAction.OnSnooze -> {
-                    eventChannel.send(TriggerEvent.FinishScreen)
                     context.cancelAlarm(state.id ?: 0)
                     ringtone?.stop()
                     vibrator?.cancel()
@@ -104,6 +102,7 @@ class TriggerViewModel @Inject constructor(
                         state.volume,
                         state.vibrate
                     )
+                    eventChannel.send(TriggerEvent.FinishScreen)
                 }
             }
         }

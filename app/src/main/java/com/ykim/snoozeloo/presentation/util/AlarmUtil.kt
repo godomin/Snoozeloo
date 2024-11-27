@@ -29,7 +29,7 @@ fun Context.registerAlarm(alarm: Alarm) {
     register(
         this,
         alarm.id,
-        alarm.time,
+        "$hour:$minute",
         alarm.name,
         alarm.ringtone.getUri(),
         alarm.volume,
