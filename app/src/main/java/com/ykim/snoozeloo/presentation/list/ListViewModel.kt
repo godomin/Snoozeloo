@@ -59,6 +59,8 @@ class ListViewModel @Inject constructor(
 
             is ListAction.OnDeleteAlarmClick -> onItemDeleted(action.alarm)
 
+            is ListAction.CheckOverlayPermission -> checkOverlayPermissionGranted()
+
             else -> Unit
         }
     }

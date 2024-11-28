@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -118,13 +119,16 @@ private fun ListScreen(
         )
     }
 
-    var showRationaleDialog by remember { mutableStateOf(false) }
-    LaunchedEffect(key1 = state.isOverlayPermissionGranted) {
-        showRationaleDialog = !state.isOverlayPermissionGranted
+    var showOverlayPermissionDialog by remember { mutableStateOf(false) }
+    DisposableEffect(key1 = Unit) {
+        onDispose { onAction(ListAction.CheckOverlayPermission) }
     }
-    if (showRationaleDialog) {
+    LaunchedEffect(key1 = state.isOverlayPermissionGranted) {
+        showOverlayPermissionDialog = !state.isOverlayPermissionGranted
+    }
+    if (showOverlayPermissionDialog) {
         OverlayPermissionDialog(
-            onDismiss = { showRationaleDialog = false }
+            onDismiss = { showOverlayPermissionDialog = false }
         )
     }
     Scaffold(
