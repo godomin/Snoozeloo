@@ -101,6 +101,7 @@ class ListViewModel @Inject constructor(
         state = state.copy(
             alarmList = state.alarmList.filter { it.id != alarm.id }
         )
+        context.cancelAlarm(alarm.id ?: 0)
         viewModelScope.launch {
             alarmRepository.deleteAlarm(alarm.toAlarmData())
         }
