@@ -19,14 +19,16 @@ class BootReceiver : BroadcastReceiver() {
     lateinit var repository: AlarmRepository
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        doAsync {
-            repository.getAlarms().onEach { alarmList ->
-                alarmList.forEach { alarmData ->
-                    if (alarmData.enabled) {
-                        context?.registerAlarm(alarmData.toAlarm(context))
+        if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
+            doAsync {
+                repository.getAlarms().onEach { alarmList ->
+                    alarmList.forEach { alarmData ->
+                        if (alarmData.enabled) {
+                            context?.registerAlarm(alarmData.toAlarm(context))
+                        }
                     }
-                }
-            }.collect()
+                }.collect()
+            }
         }
     }
 }
