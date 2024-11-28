@@ -5,7 +5,13 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.ykim.snoozeloo.domain.ALARM_ID
+import com.ykim.snoozeloo.domain.ALARM_NAME
+import com.ykim.snoozeloo.domain.ALARM_TIME
 import com.ykim.snoozeloo.domain.AlarmScheduler
+import com.ykim.snoozeloo.domain.RINGTONE_URI
+import com.ykim.snoozeloo.domain.VIBRATE
+import com.ykim.snoozeloo.domain.VOLUME
 import com.ykim.snoozeloo.domain.model.AlarmData
 import com.ykim.snoozeloo.presentation.AlarmReceiver
 import com.ykim.snoozeloo.presentation.util.getClosestDate
@@ -20,15 +26,6 @@ import javax.inject.Inject
 class AlarmSchedulerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : AlarmScheduler {
-
-    companion object {
-        const val ALARM_ID = "alarmId"
-        const val ALARM_NAME = "alarmName"
-        const val ALARM_TIME = "alarmTime"
-        const val RINGTONE_URI = "ringtoneUri"
-        const val VOLUME = "volume"
-        const val VIBRATE = "vibrate"
-    }
 
     override fun scheduleAlarm(alarm: AlarmData) {
         val (hour, minute) = alarm.time.to24HourFormat()

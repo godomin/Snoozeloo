@@ -73,12 +73,15 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.core.splashscreen)
+    implementation(libs.androidx.work.manager)
 
     // hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.hilt.work)
 
     // room
     implementation(libs.androidx.room.common)

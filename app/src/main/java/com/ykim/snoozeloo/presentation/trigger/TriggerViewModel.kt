@@ -16,6 +16,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.ykim.snoozeloo.data.AlarmRescheduleWorker
+import com.ykim.snoozeloo.domain.ALARM_ID
 import com.ykim.snoozeloo.domain.AlarmScheduler
 import com.ykim.snoozeloo.domain.model.AlarmData
 import com.ykim.snoozeloo.domain.model.RingtoneData
@@ -25,6 +30,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,6 +73,7 @@ class TriggerViewModel @Inject constructor(
             when (action) {
                 is TriggerAction.OnTurnOff -> {
                     stopAlarm()
+                    scheduleNextAlarm()
                     eventChannel.send(TriggerEvent.FinishScreen)
                 }
 
@@ -89,16 +96,26 @@ class TriggerViewModel @Inject constructor(
         vibrator?.cancel()
     }
 
+    private fun scheduleNextAlarm() {
+        val workRequest = OneTimeWorkRequestBuilder<AlarmRescheduleWorker>()
+            .setInputData(workDataOf(ALARM_ID to state.id))
+            .setInitialDelay(1, TimeUnit.HOURS)
+            .build()
+        WorkManager.getInstance(context).enqueue(workRequest)
+    }
+
     private fun snoozeAlarm() {
-        alarmScheduler.snoozeAlarm(AlarmData(
-            id = state.id,
-            time = state.time.toMinutes(),
-            name = state.name,
-            ringtone = RingtoneData.Ringtone(ringtoneUri!!),
-            volume = state.volume,
-            isVibrate = state.vibrate,
-            enabled = true
-        ))
+        alarmScheduler.snoozeAlarm(
+            AlarmData(
+                id = state.id,
+                time = state.time.toMinutes(),
+                name = state.name,
+                ringtone = RingtoneData.Ringtone(ringtoneUri!!),
+                volume = state.volume,
+                isVibrate = state.vibrate,
+                enabled = true
+            )
+        )
     }
 
     private fun playVibration() {
