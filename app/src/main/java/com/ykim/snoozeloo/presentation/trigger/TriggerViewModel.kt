@@ -16,8 +16,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ykim.snoozeloo.presentation.util.cancelAlarm
-import com.ykim.snoozeloo.presentation.util.snoozeAlarm
+import com.ykim.snoozeloo.domain.AlarmScheduler
+import com.ykim.snoozeloo.domain.model.AlarmData
+import com.ykim.snoozeloo.domain.model.RingtoneData
+import com.ykim.snoozeloo.presentation.util.toMinutes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
@@ -28,6 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TriggerViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val alarmScheduler: AlarmScheduler
 ) : ViewModel() {
 
     var state by mutableStateOf(TriggerState())
@@ -69,14 +72,7 @@ class TriggerViewModel @Inject constructor(
 
                 is TriggerAction.OnSnooze -> {
                     stopAlarm()
-                    context.snoozeAlarm(
-                        state.id ?: 0,
-                        state.time,
-                        state.name,
-                        ringtoneUri,
-                        state.volume,
-                        state.vibrate
-                    )
+                    snoozeAlarm()
                     eventChannel.send(TriggerEvent.FinishScreen)
                 }
             }
@@ -84,13 +80,25 @@ class TriggerViewModel @Inject constructor(
     }
 
     private fun stopAlarm() {
-        context.cancelAlarm(state.id ?: 0)
+        state.id?.let { alarmScheduler.cancelAlarm(it) }
         ringtone?.stop()
         if (mediaPlayer?.isPlaying == true) {
             mediaPlayer?.stop()
             mediaPlayer?.release()
         }
         vibrator?.cancel()
+    }
+
+    private fun snoozeAlarm() {
+        alarmScheduler.snoozeAlarm(AlarmData(
+            id = state.id,
+            time = state.time.toMinutes(),
+            name = state.name,
+            ringtone = RingtoneData.Ringtone(ringtoneUri!!),
+            volume = state.volume,
+            isVibrate = state.vibrate,
+            enabled = true
+        ))
     }
 
     private fun playVibration() {

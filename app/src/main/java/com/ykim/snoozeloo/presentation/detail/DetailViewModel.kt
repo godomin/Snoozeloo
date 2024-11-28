@@ -8,21 +8,19 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.ykim.snoozeloo.presentation.navigation.DetailScreen
 import com.ykim.snoozeloo.domain.AlarmRepository
+import com.ykim.snoozeloo.domain.AlarmScheduler
 import com.ykim.snoozeloo.domain.model.AlarmData
 import com.ykim.snoozeloo.presentation.model.Alarm
 import com.ykim.snoozeloo.presentation.model.Ringtone
 import com.ykim.snoozeloo.presentation.navigation.AlarmType
-import com.ykim.snoozeloo.presentation.util.cancelAlarm
+import com.ykim.snoozeloo.presentation.navigation.DetailScreen
 import com.ykim.snoozeloo.presentation.util.getDefaultRingtone
 import com.ykim.snoozeloo.presentation.util.getRingtoneTitle
 import com.ykim.snoozeloo.presentation.util.getTitle
 import com.ykim.snoozeloo.presentation.util.getUri
-import com.ykim.snoozeloo.presentation.util.registerAlarm
 import com.ykim.snoozeloo.presentation.util.timeLeft
 import com.ykim.snoozeloo.presentation.util.to24HourFormat
-import com.ykim.snoozeloo.presentation.util.toAlarm
 import com.ykim.snoozeloo.presentation.util.toMinutes
 import com.ykim.snoozeloo.presentation.util.toRingtoneData
 import com.ykim.snoozeloo.presentation.util.toggle
@@ -36,7 +34,8 @@ import kotlin.reflect.typeOf
 class DetailViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
-    private val alarmRepository: AlarmRepository
+    private val alarmRepository: AlarmRepository,
+    private val alarmScheduler: AlarmScheduler
 ) : ViewModel() {
 
     var state by mutableStateOf(DetailState())
@@ -133,8 +132,8 @@ class DetailViewModel @Inject constructor(
             alarmRepository.updateAlarm(newAlarm)
         }
         if (newAlarm.enabled) {
-            newAlarm.id?.let { context.cancelAlarm(it) }
-            context.registerAlarm(newAlarm.toAlarm(context))
+            newAlarm.id?.let { alarmScheduler.cancelAlarm(it) }
+            alarmScheduler.scheduleAlarm(newAlarm)
         }
     }
 

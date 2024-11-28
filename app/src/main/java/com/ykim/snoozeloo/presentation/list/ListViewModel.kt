@@ -8,9 +8,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ykim.snoozeloo.domain.AlarmRepository
+import com.ykim.snoozeloo.domain.AlarmScheduler
 import com.ykim.snoozeloo.presentation.model.Alarm
-import com.ykim.snoozeloo.presentation.util.cancelAlarm
-import com.ykim.snoozeloo.presentation.util.registerAlarm
 import com.ykim.snoozeloo.presentation.util.toAlarm
 import com.ykim.snoozeloo.presentation.util.toAlarmData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ListViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val alarmRepository: AlarmRepository
+    private val alarmRepository: AlarmRepository,
+    private val alarmScheduler: AlarmScheduler
 ) : ViewModel() {
 
     var state by mutableStateOf(ListState())
@@ -74,14 +74,14 @@ class ListViewModel @Inject constructor(
                 }
             }
         )
-        viewModelScope.launch {
-            alarmRepository.updateAlarm(toggledAlarm.toAlarmData())
-        }
-        if (toggledAlarm.enabled) {
-            alarm.id?.let { context.cancelAlarm(it) }
-            context.registerAlarm(toggledAlarm)
-        } else {
-            alarm.id?.let { context.cancelAlarm(it) }
+        toggledAlarm.toAlarmData().also { alarmData ->
+            viewModelScope.launch {
+                alarmRepository.updateAlarm(alarmData)
+            }
+            alarm.id?.let { alarmScheduler.cancelAlarm(it) }
+            if (alarmData.enabled) {
+                alarmScheduler.scheduleAlarm(alarmData)
+            }
         }
     }
 
@@ -101,7 +101,7 @@ class ListViewModel @Inject constructor(
         state = state.copy(
             alarmList = state.alarmList.filter { it.id != alarm.id }
         )
-        context.cancelAlarm(alarm.id ?: 0)
+        alarm.id?.let { alarmScheduler.cancelAlarm(it) }
         viewModelScope.launch {
             alarmRepository.deleteAlarm(alarm.toAlarmData())
         }

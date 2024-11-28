@@ -9,7 +9,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        //context?.showNotificationWithFullScreenIntent(intent)
         val newIntent = Intent(context, TriggerActivity::class.java).apply {
             intent?.extras?.let { putExtras(it) }
             flags = Intent.FLAG_ACTIVITY_NEW_TASK

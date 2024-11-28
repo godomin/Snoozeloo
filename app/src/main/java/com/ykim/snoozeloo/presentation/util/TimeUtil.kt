@@ -16,6 +16,7 @@ private const val DAY_IN_MINUTES = 1440
 private const val FOUR_AM_IN_MINUTES = 240
 private const val TEN_AM_IN_MINUTES = 600
 private const val EIGHT_HOUR_IN_MINUTES = 480
+private const val SNOOZE_MINUTES = 5
 
 // 870 -> "02:30 PM"
 fun Int.to12HourFormat(): Pair<String, String> {
@@ -31,10 +32,14 @@ fun Int.to12HourFormat(): Pair<String, String> {
     return time to period
 }
 
+// 870 -> "14", "30"
+fun Int.to24HourFormat(): Pair<String, String> {
+    return (this / 60).toTwoDigitString() to (this % 60).toTwoDigitString()
+}
+
 // "02:30 PM" -> "14", "30"
 fun String.to24HourFormat(period: String): Pair<String, String> {
-    val minutes = this.toMinutes(period)
-    return (minutes / 60).toTwoDigitString() to (minutes % 60).toTwoDigitString()
+    return this.toMinutes(period).to24HourFormat()
 }
 
 // "02:30 PM" -> 870
@@ -101,7 +106,7 @@ fun Int.bedTimeLeft(context: Context, enabledDays: Int): String {
 }
 
 private fun Int.toTwoDigitString(): String {
-    return String.format("%02d", this)
+    return String.format(Locale.ENGLISH, "%02d", this)
 }
 
 private fun getCurrentTimeInMinutes(): Int {
@@ -164,6 +169,6 @@ fun getSnoozedTime(
         set(Calendar.MINUTE, minute)
         set(Calendar.SECOND, 0)
         set(Calendar.MILLISECOND, 0)
-        add(Calendar.MINUTE, 5)
+        add(Calendar.MINUTE, SNOOZE_MINUTES)
     }
 }
