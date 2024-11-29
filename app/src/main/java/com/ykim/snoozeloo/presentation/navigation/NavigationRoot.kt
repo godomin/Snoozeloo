@@ -1,4 +1,4 @@
-package com.ykim.snoozeloo
+package com.ykim.snoozeloo.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -6,9 +6,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ykim.snoozeloo.presentation.detail.DetailScreenRoot
 import com.ykim.snoozeloo.presentation.list.ListScreenRoot
+import com.ykim.snoozeloo.presentation.model.Alarm
+import com.ykim.snoozeloo.presentation.model.Ringtone
 import com.ykim.snoozeloo.presentation.ringtone.RingtoneScreenRoot
 import com.ykim.snoozeloo.presentation.util.KEY_RINGTONE_URI
-import kotlinx.serialization.Serializable
+import kotlin.reflect.typeOf
 
 @Composable
 fun NavigationRoot(
@@ -17,15 +19,17 @@ fun NavigationRoot(
     NavHost(navController = navController, startDestination = ListScreen) {
         composable<ListScreen> {
             ListScreenRoot(
-                onItemClick = { id ->
-                    navController.navigate(DetailScreen(id))
+                onItemClick = { alarm ->
+                    navController.navigate(DetailScreen(alarm))
                 },
                 onAddClick = {
                     navController.navigate(DetailScreen(null))
                 }
             )
         }
-        composable<DetailScreen> {
+        composable<DetailScreen>(
+            typeMap = mapOf(typeOf<Alarm?>() to AlarmType)
+        ) {
             DetailScreenRoot(
                 navController,
                 onCloseScreen = {
@@ -49,16 +53,3 @@ fun NavigationRoot(
         }
     }
 }
-
-@Serializable
-object ListScreen
-
-@Serializable
-data class DetailScreen(
-    val id: Int?,
-)
-
-@Serializable
-data class RingtoneScreen(
-    val ringtoneUri: String
-)

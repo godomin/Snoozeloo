@@ -9,7 +9,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.ykim.snoozeloo.RingtoneScreen
+import com.ykim.snoozeloo.presentation.navigation.RingtoneScreen
 import com.ykim.snoozeloo.presentation.model.Ringtone
 import com.ykim.snoozeloo.presentation.util.getUri
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -3,9 +3,11 @@ package com.ykim.snoozeloo.di
 import android.app.Application
 import androidx.room.Room
 import com.ykim.snoozeloo.data.AlarmRepositoryImpl
+import com.ykim.snoozeloo.data.AlarmSchedulerImpl
 import com.ykim.snoozeloo.data.database.AlarmDao
 import com.ykim.snoozeloo.data.database.AlarmDatabase
 import com.ykim.snoozeloo.domain.AlarmRepository
+import com.ykim.snoozeloo.domain.AlarmScheduler
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -22,6 +24,12 @@ interface AppModule {
     fun bindAlarmRepository(
         alarmRepositoryImpl: AlarmRepositoryImpl
     ): AlarmRepository
+
+    @Binds
+    @Singleton
+    fun bindAlarmScheduler(
+        alarmSchedulerImpl: AlarmSchedulerImpl
+    ): AlarmScheduler
 
     companion object {
         @Provides

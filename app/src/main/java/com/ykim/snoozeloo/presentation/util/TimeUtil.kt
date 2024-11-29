@@ -16,6 +16,7 @@ private const val DAY_IN_MINUTES = 1440
 private const val FOUR_AM_IN_MINUTES = 240
 private const val TEN_AM_IN_MINUTES = 600
 private const val EIGHT_HOUR_IN_MINUTES = 480
+private const val SNOOZE_MINUTES = 5
 
 // 870 -> "02:30 PM"
 fun Int.to12HourFormat(): Pair<String, String> {
@@ -33,31 +34,12 @@ fun Int.to12HourFormat(): Pair<String, String> {
 
 // 870 -> "14", "30"
 fun Int.to24HourFormat(): Pair<String, String> {
-    val hour = this / 60
-    val minute = this % 60
-    return hour.toTwoDigitString() to minute.toTwoDigitString()
+    return (this / 60).toTwoDigitString() to (this % 60).toTwoDigitString()
 }
 
 // "02:30 PM" -> "14", "30"
 fun String.to24HourFormat(period: String): Pair<String, String> {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val time = LocalTime.parse(
-            "$this $period",
-            DateTimeFormatter.ofPattern(FORMAT_12_HOUR, Locale.ENGLISH)
-        )
-        val (hour, minute) = time.format(
-            DateTimeFormatter.ofPattern(
-                FORMAT_24_HOUR,
-                Locale.ENGLISH
-            )
-        ).split(":")
-        hour to minute
-    } else {
-        val date = SimpleDateFormat(FORMAT_12_HOUR, Locale.ENGLISH).parse("$this $period")
-        val (hour, minute) = SimpleDateFormat(FORMAT_24_HOUR, Locale.ENGLISH).format(date)
-            .split(":")
-        hour to minute
-    }
+    return this.toMinutes(period).to24HourFormat()
 }
 
 // "02:30 PM" -> 870
@@ -124,7 +106,7 @@ fun Int.bedTimeLeft(context: Context, enabledDays: Int): String {
 }
 
 private fun Int.toTwoDigitString(): String {
-    return String.format("%02d", this)
+    return String.format(Locale.ENGLISH, "%02d", this)
 }
 
 private fun getCurrentTimeInMinutes(): Int {
@@ -183,8 +165,10 @@ fun getSnoozedTime(
     minute: Int,
 ): Calendar {
     return Calendar.getInstance().apply {
-        add(Calendar.MINUTE, 5)
+        set(Calendar.HOUR_OF_DAY, hour)
+        set(Calendar.MINUTE, minute)
         set(Calendar.SECOND, 0)
         set(Calendar.MILLISECOND, 0)
+        add(Calendar.MINUTE, SNOOZE_MINUTES)
     }
 }

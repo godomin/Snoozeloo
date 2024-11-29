@@ -3,6 +3,7 @@ package com.ykim.snoozeloo.presentation.trigger
 import android.content.Context
 import android.content.Context.VIBRATOR_SERVICE
 import android.media.AudioAttributes
+import android.media.MediaPlayer
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
@@ -15,18 +16,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ykim.snoozeloo.presentation.util.cancelAlarm
-import com.ykim.snoozeloo.presentation.util.snoozeAlarm
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.ykim.snoozeloo.data.AlarmRescheduleWorker
+import com.ykim.snoozeloo.domain.ALARM_ID
+import com.ykim.snoozeloo.domain.AlarmScheduler
+import com.ykim.snoozeloo.domain.model.AlarmData
+import com.ykim.snoozeloo.domain.model.RingtoneData
+import com.ykim.snoozeloo.presentation.util.toMinutes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class TriggerViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val alarmScheduler: AlarmScheduler
 ) : ViewModel() {
 
     var state by mutableStateOf(TriggerState())
@@ -37,7 +47,10 @@ class TriggerViewModel @Inject constructor(
 
     private var ringtone: Ringtone? = null
     private var ringtoneUri: String? = null
+    private var mediaPlayer: MediaPlayer? = null
     private var vibrator: Vibrator? = null
+
+    var shouldHandledOnDestroy = true
 
     fun setInitialData(id: Int, time: String, name: String, volume: Int, vibrate: Boolean) {
         state = state.copy(
@@ -51,60 +64,109 @@ class TriggerViewModel @Inject constructor(
 
     fun ringAlarm(uri: String) {
         if (state.vibrate) {
-            vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val vibratorManager =
-                    context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-                vibratorManager.defaultVibrator
-            } else {
-                context.getSystemService(VIBRATOR_SERVICE) as Vibrator
-            }
-            if (Build.VERSION.SDK_INT >= 26) {
-                vibrator?.vibrate(
-                    VibrationEffect.createWaveform(
-                        longArrayOf(0, 500, 1000, 500, 0),
-                        0
-                    )
-                )
-            } else {
-                vibrator?.vibrate(500)
-            }
-        } else {
-            ringtoneUri = uri
-            ringtone = RingtoneManager.getRingtone(context, Uri.parse(uri)).apply {
-                audioAttributes = AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build()
-                volume = state.volume / 100f
-                play()
-            }
+            playVibration()
         }
+        ringtoneUri = uri
+        playRingtone()
     }
 
     fun onAction(action: TriggerAction) {
         viewModelScope.launch {
             when (action) {
                 is TriggerAction.OnTurnOff -> {
+                    stopAlarm()
+                    scheduleNextAlarm()
                     eventChannel.send(TriggerEvent.FinishScreen)
-                    context.cancelAlarm(state.id ?: 0)
-                    ringtone?.stop()
-                    vibrator?.cancel()
                 }
 
                 is TriggerAction.OnSnooze -> {
+                    stopAlarm()
+                    snoozeAlarm()
                     eventChannel.send(TriggerEvent.FinishScreen)
-                    context.cancelAlarm(state.id ?: 0)
-                    ringtone?.stop()
-                    vibrator?.cancel()
-                    context.snoozeAlarm(
-                        state.id ?: 0,
-                        state.time,
-                        state.name,
-                        ringtoneUri,
-                        state.volume,
-                        state.vibrate
-                    )
                 }
+            }
+            shouldHandledOnDestroy = false
+        }
+    }
+
+    private fun stopAlarm() {
+        state.id?.let { alarmScheduler.cancelAlarm(it) }
+        ringtone?.stop()
+        if (mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+        }
+        vibrator?.cancel()
+    }
+
+    private fun scheduleNextAlarm() {
+        val workRequest = OneTimeWorkRequestBuilder<AlarmRescheduleWorker>()
+            .setInputData(workDataOf(ALARM_ID to state.id))
+            .setInitialDelay(1, TimeUnit.HOURS)
+            .build()
+        WorkManager.getInstance(context).enqueue(workRequest)
+    }
+
+    fun handleAlarmFromActivity() {
+        if (shouldHandledOnDestroy) {
+            stopAlarm()
+            scheduleNextAlarm()
+        }
+    }
+
+    private fun snoozeAlarm() {
+        alarmScheduler.snoozeAlarm(
+            AlarmData(
+                id = state.id,
+                time = state.time.toMinutes(),
+                name = state.name,
+                ringtone = RingtoneData.Ringtone(ringtoneUri!!),
+                volume = state.volume,
+                isVibrate = state.vibrate,
+                enabled = true
+            )
+        )
+    }
+
+    private fun playVibration() {
+        vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibratorManager =
+                context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vibratorManager.defaultVibrator
+        } else {
+            context.getSystemService(VIBRATOR_SERVICE) as Vibrator
+        }
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibrator?.vibrate(
+                VibrationEffect.createWaveform(
+                    longArrayOf(0, 500, 1000, 500, 0),
+                    0
+                )
+            )
+        } else {
+            vibrator?.vibrate(500)
+        }
+    }
+
+    private fun playRingtone() {
+        val alarmAudioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ALARM)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            ringtone = RingtoneManager.getRingtone(context, Uri.parse(ringtoneUri)).apply {
+                audioAttributes = alarmAudioAttributes
+                volume = state.volume / 100f
+                play()
+            }
+        } else {
+            mediaPlayer = MediaPlayer().apply {
+                setDataSource(context, Uri.parse(ringtoneUri))
+                setVolume(state.volume / 100f, state.volume / 100f)
+                isLooping = true
+                setAudioAttributes(alarmAudioAttributes)
+                prepare()
+                start()
             }
         }
     }

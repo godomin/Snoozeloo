@@ -8,19 +8,19 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.ykim.snoozeloo.DetailScreen
 import com.ykim.snoozeloo.domain.AlarmRepository
+import com.ykim.snoozeloo.domain.AlarmScheduler
 import com.ykim.snoozeloo.domain.model.AlarmData
+import com.ykim.snoozeloo.presentation.model.Alarm
 import com.ykim.snoozeloo.presentation.model.Ringtone
-import com.ykim.snoozeloo.presentation.util.cancelAlarm
+import com.ykim.snoozeloo.presentation.navigation.AlarmType
+import com.ykim.snoozeloo.presentation.navigation.DetailScreen
 import com.ykim.snoozeloo.presentation.util.getDefaultRingtone
 import com.ykim.snoozeloo.presentation.util.getRingtoneTitle
 import com.ykim.snoozeloo.presentation.util.getTitle
 import com.ykim.snoozeloo.presentation.util.getUri
-import com.ykim.snoozeloo.presentation.util.registerAlarm
 import com.ykim.snoozeloo.presentation.util.timeLeft
 import com.ykim.snoozeloo.presentation.util.to24HourFormat
-import com.ykim.snoozeloo.presentation.util.toAlarm
 import com.ykim.snoozeloo.presentation.util.toMinutes
 import com.ykim.snoozeloo.presentation.util.toRingtoneData
 import com.ykim.snoozeloo.presentation.util.toggle
@@ -28,35 +28,38 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.reflect.typeOf
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
-    private val alarmRepository: AlarmRepository
+    private val alarmRepository: AlarmRepository,
+    private val alarmScheduler: AlarmScheduler
 ) : ViewModel() {
 
     var state by mutableStateOf(DetailState())
         private set
 
+    private val typeMap = mapOf(typeOf<Alarm?>() to AlarmType)
+
     init {
         viewModelScope.launch {
-            val detailScreen = savedStateHandle.toRoute<DetailScreen>()
-            detailScreen.id?.let { id ->
-                val alarm = alarmRepository.getAlarm(id)?.toAlarm(context)
-                val (hour, minute) = alarm?.time?.to24HourFormat(alarm.period) ?: ("00" to "00")
-                val ringtone = alarm?.ringtone ?: getDefaultRingtone(context)
+            val detailScreen = savedStateHandle.toRoute<DetailScreen>(typeMap)
+            detailScreen.alarm?.let { alarm ->
+                val (hour, minute) = alarm.time.to24HourFormat(alarm.period)
+                val ringtone = alarm.ringtone
                 state = state.copy(
-                    id = id,
-                    name = alarm?.name ?: "",
+                    id = alarm.id,
+                    name = alarm.name ?: "",
                     hour = hour,
                     minute = minute,
-                    enabled = alarm?.enabled ?: true,
-                    enabledDays = alarm?.enabledDays ?: 0,
+                    enabled = alarm.enabled,
+                    enabledDays = alarm.enabledDays,
                     ringtoneUri = ringtone.getUri(),
                     ringtoneTitle = ringtone.getTitle(context),
-                    volume = alarm?.volume ?: 50,
-                    isVibrate = alarm?.isVibrate ?: false
+                    volume = alarm.volume,
+                    isVibrate = alarm.isVibrate
                 )
                 checkValidTime(hour, minute)
             } ?: run {
@@ -129,8 +132,8 @@ class DetailViewModel @Inject constructor(
             alarmRepository.updateAlarm(newAlarm)
         }
         if (newAlarm.enabled) {
-            newAlarm.id?.let { context.cancelAlarm(it) }
-            context.registerAlarm(newAlarm.toAlarm(context))
+            newAlarm.id?.let { alarmScheduler.cancelAlarm(it) }
+            alarmScheduler.scheduleAlarm(newAlarm)
         }
     }
 

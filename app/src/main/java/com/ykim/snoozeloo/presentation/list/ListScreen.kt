@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +46,7 @@ import com.ykim.snoozeloo.R
 import com.ykim.snoozeloo.presentation.components.ListCard
 import com.ykim.snoozeloo.presentation.components.SnoozelooButton
 import com.ykim.snoozeloo.presentation.components.SnoozelooFloatingActionButton
+import com.ykim.snoozeloo.presentation.components.SwipeableItem
 import com.ykim.snoozeloo.presentation.model.Alarm
 import com.ykim.snoozeloo.presentation.model.Ringtone
 import com.ykim.snoozeloo.presentation.util.hasNotificationPermission
@@ -53,7 +55,7 @@ import com.ykim.snoozeloo.ui.theme.SnoozelooTheme
 
 @Composable
 fun ListScreenRoot(
-    onItemClick: (Int) -> Unit,
+    onItemClick: (Alarm) -> Unit,
     onAddClick: () -> Unit,
     viewModel: ListViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
 ) {
@@ -62,7 +64,7 @@ fun ListScreenRoot(
         onAction = { action ->
             when (action) {
                 is ListAction.OnAddAlarmClick -> onAddClick()
-                is ListAction.OnEditAlarmClick -> onItemClick(action.id)
+                is ListAction.OnEditAlarmClick -> onItemClick(action.alarm)
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -117,13 +119,16 @@ private fun ListScreen(
         )
     }
 
-    var showRationaleDialog by remember { mutableStateOf(false) }
-    LaunchedEffect(key1 = state.isOverlayPermissionGranted) {
-        showRationaleDialog = !state.isOverlayPermissionGranted
+    var showOverlayPermissionDialog by remember { mutableStateOf(false) }
+    DisposableEffect(key1 = Unit) {
+        onDispose { onAction(ListAction.CheckOverlayPermission) }
     }
-    if (showRationaleDialog) {
+    LaunchedEffect(key1 = state.isOverlayPermissionGranted) {
+        showOverlayPermissionDialog = !state.isOverlayPermissionGranted
+    }
+    if (showOverlayPermissionDialog) {
         OverlayPermissionDialog(
-            onDismiss = { showRationaleDialog = false }
+            onDismiss = { showOverlayPermissionDialog = false }
         )
     }
     Scaffold(
@@ -171,24 +176,28 @@ private fun ListScreen(
             } else {
                 Spacer(modifier = Modifier.height(24.dp))
                 LazyColumn(
-                    modifier = Modifier,
+                    modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(
                         items = state.alarmList,
                         key = { alarm -> alarm.id ?: 0 }
                     ) { alarm ->
-                        ListCard(
-                            modifier = Modifier.clickable {
-                                alarm.id?.let { id ->
-                                    onAction(ListAction.OnEditAlarmClick(id))
-                                }
-                            },
-                            data = alarm,
-                            onToggle = {
-                                onAction(ListAction.OnAlarmToggleClick(alarm))
-                            }
-                        )
+                        SwipeableItem(
+                            modifier = Modifier.animateItem(),
+                            isRevealed = alarm.isDeleteMode,
+                            onExpanded = { onAction(ListAction.OnItemDragged(true, alarm)) },
+                            onCollapsed = { onAction(ListAction.OnItemDragged(false, alarm)) },
+                            onActionClicked = { onAction(ListAction.OnDeleteAlarmClick(alarm)) }
+                        ) {
+                            ListCard(
+                                modifier = Modifier.clickable {
+                                    onAction(ListAction.OnEditAlarmClick(alarm))
+                                },
+                                data = alarm,
+                                onToggle = { onAction(ListAction.OnAlarmToggleClick(alarm)) }
+                            )
+                        }
                     }
                 }
             }

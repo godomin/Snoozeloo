@@ -36,7 +36,7 @@ fun Alarm.toAlarmData(): AlarmData {
     )
 }
 
-private fun RingtoneData.toRingtone(context: Context): Ringtone {
+fun RingtoneData.toRingtone(context: Context): Ringtone {
     return when (this) {
         is RingtoneData.Ringtone -> Ringtone.Normal(uri.getRingtoneTitle(context), uri)
         is RingtoneData.Silent -> Ringtone.Silent

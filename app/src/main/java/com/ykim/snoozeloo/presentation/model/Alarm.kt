@@ -1,5 +1,8 @@
 package com.ykim.snoozeloo.presentation.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Alarm(
     val name: String? = null,
     val time: String, // 12hour format
@@ -11,5 +14,6 @@ data class Alarm(
     val ringtone: Ringtone,
     val volume: Int,
     val isVibrate: Boolean,
+    val isDeleteMode: Boolean = false,
     val id: Int? = null,
 )
