@@ -9,19 +9,14 @@ import com.ykim.snoozeloo.domain.AlarmRepository
 import com.ykim.snoozeloo.domain.AlarmScheduler
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import javax.inject.Inject
 
 @HiltWorker
 class AlarmRescheduleWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
+    private val repository: AlarmRepository,
+    private val scheduler: AlarmScheduler,
 ) : CoroutineWorker(context, workerParams) {
-
-    @Inject
-    lateinit var repository: AlarmRepository
-
-    @Inject
-    lateinit var scheduler: AlarmScheduler
 
     override suspend fun doWork(): Result {
         inputData.getInt(ALARM_ID, -1).let { alarmId ->
