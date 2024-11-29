@@ -42,6 +42,7 @@
             android:launchMode="singleInstance"
             android:permission="android.permission.SYSTEM_ALERT_WINDOW"
             android:showOnLockScreen="true"
+            android:theme="@android:style/Theme.Material.NoActionBar"
             android:turnScreenOn="true" />
 
         <receiver android:name=".data.AlarmReceiver" />
