@@ -1,11 +1,11 @@
-package com.ykim.snoozeloo.presentation
+package com.ykim.snoozeloo.data
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.ykim.snoozeloo.domain.AlarmRepository
 import com.ykim.snoozeloo.domain.AlarmScheduler
-import com.ykim.snoozeloo.presentation.util.doAsync
+import com.ykim.snoozeloo.data.util.doAsync
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach

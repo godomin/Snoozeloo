@@ -44,9 +44,9 @@
             android:showOnLockScreen="true"
             android:turnScreenOn="true" />
 
-        <receiver android:name=".presentation.AlarmReceiver" />
+        <receiver android:name=".data.AlarmReceiver" />
         <receiver
-            android:name=".presentation.BootReceiver"
+            android:name=".data.BootReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

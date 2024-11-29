@@ -13,12 +13,9 @@ import com.ykim.snoozeloo.domain.RINGTONE_URI
 import com.ykim.snoozeloo.domain.VIBRATE
 import com.ykim.snoozeloo.domain.VOLUME
 import com.ykim.snoozeloo.domain.model.AlarmData
-import com.ykim.snoozeloo.presentation.AlarmReceiver
 import com.ykim.snoozeloo.presentation.util.getClosestDate
 import com.ykim.snoozeloo.presentation.util.getSnoozedTime
-import com.ykim.snoozeloo.presentation.util.getUri
 import com.ykim.snoozeloo.presentation.util.to24HourFormat
-import com.ykim.snoozeloo.presentation.util.toRingtone
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Calendar
 import javax.inject.Inject
@@ -34,7 +31,7 @@ class AlarmSchedulerImpl @Inject constructor(
             alarm.id,
             "$hour:$minute",
             alarm.name,
-            alarm.ringtone.toRingtone(context).getUri(),
+            alarm.ringtone.getUri(),
             alarm.volume,
             alarm.isVibrate,
             closestTime
@@ -54,7 +51,7 @@ class AlarmSchedulerImpl @Inject constructor(
             alarm.id,
             "$hour:$minute",
             alarm.name,
-            alarm.ringtone.toRingtone(context).getUri(),
+            alarm.ringtone.getUri(),
             alarm.volume,
             alarm.isVibrate,
             snoozedTime

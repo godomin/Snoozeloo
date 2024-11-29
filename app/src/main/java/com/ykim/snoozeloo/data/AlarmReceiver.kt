@@ -1,4 +1,4 @@
-package com.ykim.snoozeloo.presentation
+package com.ykim.snoozeloo.data
 
 import android.content.BroadcastReceiver
 import android.content.Context

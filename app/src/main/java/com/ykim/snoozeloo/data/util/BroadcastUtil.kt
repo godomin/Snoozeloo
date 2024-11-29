@@ -1,4 +1,4 @@
-package com.ykim.snoozeloo.presentation.util
+package com.ykim.snoozeloo.data.util
 
 import android.content.BroadcastReceiver
 import kotlinx.coroutines.CoroutineScope
