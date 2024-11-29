@@ -39,7 +39,7 @@
             android:name=".presentation.trigger.TriggerActivity"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:launchMode="singleTask"
+            android:launchMode="singleInstance"
             android:permission="android.permission.SYSTEM_ALERT_WINDOW"
             android:showOnLockScreen="true"
             android:turnScreenOn="true" />

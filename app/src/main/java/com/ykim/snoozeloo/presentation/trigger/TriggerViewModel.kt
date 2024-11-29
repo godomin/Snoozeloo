@@ -50,6 +50,8 @@ class TriggerViewModel @Inject constructor(
     private var mediaPlayer: MediaPlayer? = null
     private var vibrator: Vibrator? = null
 
+    var shouldHandledOnDestroy = true
+
     fun setInitialData(id: Int, time: String, name: String, volume: Int, vibrate: Boolean) {
         state = state.copy(
             id = id,
@@ -83,6 +85,7 @@ class TriggerViewModel @Inject constructor(
                     eventChannel.send(TriggerEvent.FinishScreen)
                 }
             }
+            shouldHandledOnDestroy = false
         }
     }
 
@@ -102,6 +105,13 @@ class TriggerViewModel @Inject constructor(
             .setInitialDelay(1, TimeUnit.HOURS)
             .build()
         WorkManager.getInstance(context).enqueue(workRequest)
+    }
+
+    fun handleAlarmFromActivity() {
+        if (shouldHandledOnDestroy) {
+            stopAlarm()
+            scheduleNextAlarm()
+        }
     }
 
     private fun snoozeAlarm() {

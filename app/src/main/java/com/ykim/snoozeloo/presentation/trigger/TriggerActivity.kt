@@ -1,9 +1,14 @@
 package com.ykim.snoozeloo.presentation.trigger
 
+import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import com.ykim.snoozeloo.domain.ALARM_ID
 import com.ykim.snoozeloo.domain.ALARM_NAME
 import com.ykim.snoozeloo.domain.ALARM_TIME
@@ -19,9 +24,12 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class TriggerActivity : ComponentActivity() {
+    private val viewModel: TriggerViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        hideNavigationBar()
         val alarmId = intent.getIntExtra(ALARM_ID, 0)
         val alarmTime = intent.getStringExtra(ALARM_TIME) ?: ""
         val alarmName = intent.getStringExtra(ALARM_NAME) ?: ""
@@ -43,8 +51,28 @@ class TriggerActivity : ComponentActivity() {
         turnScreenOnAndKeyguardOff()
     }
 
+    override fun onPause() {
+        super.onPause()
+        viewModel.handleAlarmFromActivity()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         turnScreenOffAndKeyguardOn()
+    }
+
+    private fun hideNavigationBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.apply {
+                hide(WindowInsets.Type.navigationBars())
+                systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    )
+        }
     }
 }
